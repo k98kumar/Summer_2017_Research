@@ -26,13 +26,15 @@ import java.util.TimeZone;
 
 /**
  * Created by Koushhik Kumar on 5/28/17.
- * Using Xerces DOM by Apache: https://xerces.apache.org/xerces2-j/faq-dom.html
+ * Using Xerces DOM by Apache:
+ * @see "https://xerces.apache.org/xerces2-j/faq-dom.html"
  * For Word Document instructions:
  * @see "https://www.tutorialspoint.com/apache_poi_word/apache_poi_word_quick_guide.htm"
  */
 public class Executor {
 
     static String captions = "";
+    static ArrayList<P_Properties> propArray = new ArrayList<>();
 
     /**
      *
@@ -43,24 +45,33 @@ public class Executor {
      * @throws org.xml.sax.SAXException
      * @throws ParseException
      * @throws ParserConfigurationException
+     * @see  "https://stackoverflow.com/a/3936452/7211793"
      */
     public static void main(String[] args) throws IOException, org.xml.sax.SAXException, ParseException, ParserConfigurationException {
 
+        // Logging object to log the key points
+        Logging logger = new Logging("",-1, -1);
+
+        // START Arguments to variables
         String fileOrURL = args[0];
         String pathName = args[1];
         String outputLocation = args[2];
+        // END Arguments to variable
 
-        // https://stackoverflow.com/a/3936452/7211793
+        // START Analyze argument
+        String fileType = outputLocation.substring(outputLocation.lastIndexOf('.') + 1);
+        // END Analyze argument
+
+        // START Create a path
         Path path = Paths.get(pathName);
         Charset charset = StandardCharsets.UTF_8;
         String fileString = new String(Files.readAllBytes(path), charset);
         fileString = fileString.replaceAll("<br/>", "").replaceAll("&apos;", "'");
         Files.write(path, fileString.getBytes(charset));
+        // END Create a path
 
-        String fileType = outputLocation.substring(outputLocation.lastIndexOf('.') + 1);
-
+        // START Create the document
         Document doc;
-
         switch (fileOrURL.toLowerCase()) {
             case "file":
                 if (checkForBOM(new File(pathName)))
@@ -75,9 +86,12 @@ public class Executor {
                 doc = null;
                 break;
         }
+        // END Create the document
 
-        ArrayList<P_Properties> text = extract(doc);
-        createDoc(text, outputLocation, fileType);
+        // START Create the file in the location specified
+        propArray = extract(doc);
+        createDoc(outputLocation, fileType, propArray);
+        // END Create the file in the location specified
 
     }
 
@@ -288,7 +302,7 @@ public class Executor {
      * @param arrayForFile  ArrayList of P_Properties objects
      * @see  "https://stackoverflow.com/a/2885224/7211793"
      */
-    private static void createDoc(ArrayList<P_Properties> arrayForFile, String outputPath, String fileType) {
+    private static void createDoc(String outputPath, String fileType, ArrayList<P_Properties> arrayForFile) {
 
         String lineSep = System.getProperty("line.separator");
         // Path file = Paths.get(File.separator + "Users" + File.separator + "kash" + File.separator + "Desktop" + File.separator + "Testing.txt");
@@ -305,15 +319,6 @@ public class Executor {
             e.printStackTrace();
             System.out.println("Failed");
         }
-    }
-
-    private static ArrayList<Integer> sepCapWPM() {
-        ArrayList<Integer> bing = new ArrayList<>();
-        
-    }
-
-    private static int wholeWPM() {
-
     }
 
 }
