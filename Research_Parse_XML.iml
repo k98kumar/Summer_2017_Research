@@ -7,22 +7,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module-library">
       <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/Downloads/poi-3.16/poi-3.16.jar!/" />
-        </CLASSES>
+        <CLASSES />
         <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/Downloads/poi-3.16/poi-ooxml-schemas-3.16.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../commons-io-2.5-src/src/main/java" />
+          <root url="file://$MODULE_DIR$/../commons-io-2.5-src/src/test/java" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>

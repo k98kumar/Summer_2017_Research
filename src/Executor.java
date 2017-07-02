@@ -33,8 +33,8 @@ import java.util.TimeZone;
  */
 public class Executor {
 
-    static String captions = "";
-    static ArrayList<P_Properties> propArray = new ArrayList<>();
+    private static String captions = "";
+    private static ArrayList<P_Properties> propArray = new ArrayList<>();
 
     /**
      *
@@ -50,7 +50,8 @@ public class Executor {
     public static void main(String[] args) throws IOException, org.xml.sax.SAXException, ParseException, ParserConfigurationException {
 
         // Logging object to log the key points
-        Logging logger = new Logging("",-1, -1);
+        Logging loggerGeneral = new Logging("",-1, -1);
+        Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, 0);
 
         // START Arguments to variables
         String fileOrURL = args[0];
@@ -92,6 +93,10 @@ public class Executor {
         propArray = extract(doc);
         createDoc(outputLocation, fileType, propArray);
         // END Create the file in the location specified
+
+        // START Analyzing Pronouns
+
+        // END Analyzing Pronouns
 
     }
 
