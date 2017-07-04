@@ -1,99 +1,154 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by kash on 6/14/17.
  */
 public class Logging {
 
-    private String speech;
     private int numberOfWords;
     private double secondsSpoken;
-    private int personalPronouns;
-    private ArrayList<PronounCount> personalArray;
-    private int audiencePronouns;
-    private ArrayList<PronounCount> audienceArray;
-    private int thirdPersonPronouns;
-    private ArrayList<PronounCount> thirdPersonArray;
-    private int newWords;
+    int personalPronouns;
+    ArrayList<PronounCount> personalArray;
+    int audiencePronouns;
+    ArrayList<PronounCount> audienceArray;
+    int thirdPersonPronouns;
+    ArrayList<PronounCount> thirdPersonArray;
+    String logFile;
+
+    Logging(String logFile) {
+        this.logFile = logFile;
+    }
 
     /**
      * Constructor that contains all information
-     * Just call like: Logging hello = new Logging(false, -1, -1)
-     *                 hello.parsed = true;
+     * Just call like: Logging hello = new Logging(-1, -1)
      *                 hello.numberOfWords = 250;
      *                 hello.secondsSpoken = 60.5
-     * @param speech  String of all captions merged together
      * @param numberOfWords  Number of words counted in documnet
      * @param secondsSpoken  Length of time speaker spoke
      */
-    public Logging(String speech, int numberOfWords, double secondsSpoken) {
-        this.speech = speech;
+    Logging(int numberOfWords, double secondsSpoken) {
         this.numberOfWords = numberOfWords;
         this.secondsSpoken = secondsSpoken;
     }
 
-    public Logging(int personalPronouns, ArrayList<PronounCount> personalArray,
-                   int audiencePronouns, ArrayList<PronounCount> audienceArray,
-                   int thirdPersonPronouns, ArrayList<PronounCount> thirdPersonArray, int newWords) {
+    Logging(int personalPronouns, ArrayList<PronounCount> personalArray,
+            int audiencePronouns, ArrayList<PronounCount> audienceArray,
+            int thirdPersonPronouns, ArrayList<PronounCount> thirdPersonArray,
+            String logFile) {
         this.personalPronouns = personalPronouns;
         this.personalArray = personalArray;
         this.audiencePronouns = audiencePronouns;
         this.audienceArray = audienceArray;
         this.thirdPersonPronouns = thirdPersonPronouns;
         this.thirdPersonArray = thirdPersonArray;
-        this.newWords = newWords;
+        this.logFile = logFile;
+    }
+
+    // START Overall Log Methods
+    public void startProgram() {
+        String timeStamp = currentDateTimeString() + "Started Analyzing Document\n\n";
+        appendIntoFile(logFile, timeStamp);
     }
 
     public void finishedParsingDoc() {
-        String label = "Finished Parsing Document\n\n";
+        String timeStamp = currentDateTimeString() + "Finished Parsing Document\n\n";
+        appendIntoFile(logFile, timeStamp);
     }
 
+    public void endProgram() {
+        String timeStamp = currentDateTimeString() + "Finished Analyzing Document\n\n";
+        appendIntoFile(logFile, timeStamp);
+    }
+    // END Overall Log Methods
+
+    // START SpeechRate.java
     public void finishedCountingWords() {
+        String timeStamp = currentDateTimeString() + "Words Spoken Calculated\n";
         String label = "Number of Words Spoken:\t";
-        label += numberOfWords + "\n";
-        // Now append it into the log file
+        label += numberOfWords + "\n\n";
+        appendIntoFile(logFile, timeStamp + label);
     }
 
     public void calculatedTimeSpoken() {
+        String timeStamp = currentDateTimeString() + "Time Spoken Calculated\n";
         String label = "Amount of Time Spoken:\t";
-        label += secondsSpoken + "sec\n";
-        // Now append it into the log file
+        label += secondsSpoken + "sec\n\n";
+        appendIntoFile(logFile, timeStamp + label);
     }
 
-    public void calculatedAverageRate() {
+    public void calculatedAverageRateOfSpeech() {
+        String timeStamp = currentDateTimeString() + "Rate of Speech Calculated\n";
         String label = "Average Rate of Speech:\t";
-        label += numberOfWords / secondsSpoken + "words/sec";
-        // Now append it into the log file
+        label += numberOfWords / secondsSpoken + "words/sec\n\n";
+        appendIntoFile(logFile, timeStamp + label);
     }
+    // END SpeechRate.java
 
+    // START AnalyzePronouns.java
     public void numberOfPersonalPronouns() {
+        String timeStamp = currentDateTimeString() + "Personal Pronouns Totalled\n";
         String label = "Number of Personal Pronouns:\t";
         label += personalPronouns + "\n";
         for (PronounCount thing : personalArray) {
             label += "\t" + thing.getPronoun() + ":\t" + thing.getCount() + "\n";
         }
-        // Now append it into the log file
+        label += "\n";
+        appendIntoFile(logFile, timeStamp + label);
     }
 
     public void numberOfAudiencePronouns() {
+        String timeStamp = currentDateTimeString() + "Audience Pronouns Totalled\n";
         String label = "Number of Audience Pronouns:\t";
         label += audiencePronouns + "\n";
         for (PronounCount thing : audienceArray) {
             label += "\t" + thing.getPronoun() + ":\t" + thing.getCount() + "\n";
         }
-        // Now append it into the log file
+        label += "\n";
+        appendIntoFile(logFile, timeStamp + label);
     }
 
     public void numberOfThirdPersonPronouns() {
+        String timeStamp = currentDateTimeString() + "Third Person Pronouns Totalled\n";
         String label = "Number of Third Person Pronouns:\t";
         label += thirdPersonPronouns + "\n";
         for (PronounCount thing : thirdPersonArray) {
             label += "\t" + thing.getPronoun() + ":\t" + thing.getCount() + "\n";
         }
-        // Now append it into the log file
+        label += "\n";
+        appendIntoFile(logFile, timeStamp + label);
+    }
+    // END AnalyzePronouns.java
+
+    // START Helper Methods
+    private String currentDateTimeString() {
+        DateFormat DF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = new Date();
+        return DF.format(date) + " | ";
     }
 
-    public void newConceptWords() {
-
+    private void appendIntoFile(String filePath, String text) {
+        Path path = Paths.get(filePath);
+        File file = new File(filePath);
+        try {
+            if (file.exists()) {
+                Files.write(path, text.getBytes(), StandardOpenOption.APPEND);
+            } else {
+                Files.write(path, text.getBytes(), StandardOpenOption.CREATE);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+    // END Helper Methods
+
 }

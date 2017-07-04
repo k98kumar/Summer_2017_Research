@@ -1,5 +1,3 @@
-import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,14 +9,14 @@ import java.util.TimeZone;
 public class SpeechRate {
 
     private ArrayList<P_Properties> capList;
-    Logging logger = new Logging("", -1, -1);
+    private String logFile;
 
-    // This class should have methods that include
-    // the logging methods from the Logging class
-
-    public SpeechRate(ArrayList<P_Properties> capList) {
+    public SpeechRate(ArrayList<P_Properties> capList, String logFile) {
         this.capList = capList;
+        this.logFile = logFile;
     }
+
+    private Logging logger = new Logging(-1, -1);
 
     /**
      * Uses an arrayList as a parameter, in constructor.

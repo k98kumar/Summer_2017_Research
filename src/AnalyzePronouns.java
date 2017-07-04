@@ -6,15 +6,21 @@ import java.util.Arrays;
  */
 public class AnalyzePronouns {
 
-    private String captions;
-
     public String[] persArr = {"I", "me", "myself"};
     public String[] audArr = {"you", "yourself", "yourselves", "we"};
     public String[] thirdArr = {"his", "her", "himself", "herself", "them", "themselves", "they"};
 
-    public AnalyzePronouns(String captions) {
+    private String captions;
+    private String logFile;
+
+
+
+    public AnalyzePronouns(String captions, String logFile) {
         this.captions = captions;
+        this.logFile = logFile;
     }
+
+    Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, null);
 
     /*
        Search for the words when they are surrounded by spaces or when they are
@@ -22,6 +28,19 @@ public class AnalyzePronouns {
        For example, looking for "I":
            |-> Look for " I " and " I."
      */
+
+    public void compAP() {
+        loggerPronouns.logFile = logFile;
+        loggerPronouns.personalArray = countTraverse(persArr);
+        loggerPronouns.personalPronouns = totalCount(loggerPronouns.personalArray);
+        loggerPronouns.numberOfPersonalPronouns();
+        loggerPronouns.audienceArray = countTraverse(audArr);
+        loggerPronouns.audiencePronouns = totalCount(loggerPronouns.audienceArray);
+        loggerPronouns.numberOfAudiencePronouns();
+        loggerPronouns.thirdPersonArray = countTraverse(thirdArr);
+        loggerPronouns.thirdPersonPronouns = totalCount(loggerPronouns.thirdPersonArray);
+        loggerPronouns.numberOfThirdPersonPronouns();
+    }
 
     /**
      * Only thing in this class that uses the constructor

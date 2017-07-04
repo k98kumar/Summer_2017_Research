@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +31,8 @@ import java.util.TimeZone;
  * @see "https://xerces.apache.org/xerces2-j/faq-dom.html"
  * For Word Document instructions:
  * @see "https://www.tutorialspoint.com/apache_poi_word/apache_poi_word_quick_guide.htm"
+ * To show a file in Terminal and refresh every second:
+ *     while [ 1 ]; do clear; date; cat fileName; sleep 1; done
  */
 public class Executor {
 
@@ -41,6 +44,7 @@ public class Executor {
      * @param args  First Argument:  Whether the input xml is in a file or URL
      *              Second Argument: The file or URL (pick which is specified)
      *              Third Argument:  Where output should be written
+     *              Fourth Argument: Location of the log file
      * @throws IOException
      * @throws org.xml.sax.SAXException
      * @throws ParseException
@@ -49,18 +53,29 @@ public class Executor {
      */
     public static void main(String[] args) throws IOException, org.xml.sax.SAXException, ParseException, ParserConfigurationException {
 
-        // Logging object to log the key points
-        Logging loggerGeneral = new Logging("",-1, -1);
-        Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, 0);
-
         // START Arguments to variables
         String fileOrURL = args[0];
         String pathName = args[1];
-        String outputLocation = args[2];
+        String outputFile = args[2];
+        String logFile = args[3];
         // END Arguments to variable
 
+        /*Scanner input = new Scanner(System.in);
+        if (new File(logFile).exists()) {
+            System.out.println("File Exists. Delete this file? (Y or N)");
+            if (input.nextLine().equals("Y")) Files.delete(Paths.get(logFile));
+        }*/
+
+        // START Delete file if exists
+        Files.delete(Paths.get(logFile));
+        // END Delete file if exists
+
+        Logging something = new Logging(logFile);
+        something.startProgram();
+
         // START Analyze argument
-        String fileType = outputLocation.substring(outputLocation.lastIndexOf('.') + 1);
+        String outputFileType = outputFile.substring(outputFile.lastIndexOf('.') + 1);
+        String logFileType = logFile.substring(logFile.lastIndexOf('.') + 1);
         // END Analyze argument
 
         // START Create a path
@@ -91,12 +106,18 @@ public class Executor {
 
         // START Create the file in the location specified
         propArray = extract(doc);
-        createDoc(outputLocation, fileType, propArray);
+        createDoc(outputFile, outputFileType, propArray);
         // END Create the file in the location specified
 
+        something.finishedParsingDoc();
+
         // START Analyzing Pronouns
+        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile);
+        AP.compAP();
 
         // END Analyzing Pronouns
+
+        something.endProgram();
 
     }
 
