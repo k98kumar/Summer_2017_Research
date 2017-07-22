@@ -1,7 +1,7 @@
 /**
  * Created by kash on 5/28/17.
  */
-public class P_Properties {
+public class CaptionProp {
 
     // -------------------------------------- //
     //     Time format is in HH:mm:ss.SSS     //
@@ -14,7 +14,7 @@ public class P_Properties {
     String text;
     static final String DELIMITOR = ",";
 
-    public P_Properties(String begin, String end, String timeDiff, String region, String text) {
+    public CaptionProp(String begin, String end, String timeDiff, String region, String text) {
         this.begin = begin;
         this.end = end;
         this.timeDiff = timeDiff;
@@ -42,7 +42,7 @@ public class P_Properties {
         return text;
     }
 
-    public static String toString(P_Properties singleObject) {
+    public static String toString(CaptionProp singleObject) {
         String begin = "Begin: " + singleObject.begin + "\n";
         String end = "End: " + singleObject.end + "\n";
         String timeDiff = "Time Difference: " + singleObject.timeDiff + "\n";
@@ -52,7 +52,7 @@ public class P_Properties {
         return begin + end + timeDiff + region + text;
     }
 
-    public static String toStringCSV(P_Properties singleObject) {
+    public static String toStringCSV(CaptionProp singleObject) {
         String begin = "Begin:" + DELIMITOR + singleObject.begin + DELIMITOR;
         String end = "End: " + DELIMITOR + singleObject.end + DELIMITOR;
         String timeDiff = "Diff: " + DELIMITOR + singleObject.timeDiff + DELIMITOR;

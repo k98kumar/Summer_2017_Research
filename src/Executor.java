@@ -37,7 +37,7 @@ import java.util.TimeZone;
 public class Executor {
 
     private static String captions = "";
-    private static ArrayList<P_Properties> propArray = new ArrayList<>();
+    private static ArrayList<CaptionProp> propArray = new ArrayList<>();
 
     /**
      *
@@ -70,8 +70,8 @@ public class Executor {
         Files.delete(Paths.get(logFile));
         // END Delete file if exists
 
-        Logging something = new Logging(logFile);
-        something.startProgram();
+        Logging programLogs = new Logging(logFile);
+        programLogs.startProgram();
 
         // START Analyze argument
         String outputFileType = outputFile.substring(outputFile.lastIndexOf('.') + 1);
@@ -109,15 +109,22 @@ public class Executor {
         createDoc(outputFile, outputFileType, propArray);
         // END Create the file in the location specified
 
-        something.finishedParsingDoc();
+        // START Doc parse end log
+        programLogs.finishedParsingDoc();
+        // END Doc parse end log
+
+        // START Speech Rate
+        SpeechRate SR = new SpeechRate(propArray, logFile);
+        // END Speech Rate
 
         // START Analyzing Pronouns
         AnalyzePronouns AP = new AnalyzePronouns(captions, logFile);
         AP.compAP();
-
         // END Analyzing Pronouns
 
-        something.endProgram();
+        // START Program end
+        programLogs.endProgram();
+        // END Program end
 
     }
 
@@ -257,9 +264,9 @@ public class Executor {
      * @throws IOException  extract() method throws exception
      * @see  "https://stackoverflow.com/a/7902162"
      */
-    private static ArrayList<P_Properties> extract(Document doc) throws org.xml.sax.SAXException, IOException, ParseException {
+    private static ArrayList<CaptionProp> extract(Document doc) throws org.xml.sax.SAXException, IOException, ParseException {
 
-        ArrayList<P_Properties> arrayList = new ArrayList<>();
+        ArrayList<CaptionProp> arrayList = new ArrayList<>();
 
         NodeList nl = doc.getElementsByTagName("p");
         for (int i = 0; i < nl.getLength(); i++) {
@@ -291,7 +298,7 @@ public class Executor {
                 text = "";
             }
 
-            arrayList.add(new P_Properties(begin, end, dateFormatted, region, text));
+            arrayList.add(new CaptionProp(begin, end, dateFormatted, region, text));
 
         }
 
@@ -302,20 +309,20 @@ public class Executor {
     /**
      * Uses toStringCSV() to convert the Strings to comma-separated values
      * Uses toString() to convert the Strings to string for text files
-     * @param arrayOfObjects  ArrayList of P_Properties objects created from XML
+     * @param arrayOfObjects  ArrayList of CaptionProp objects created from XML
      * @return  ArrayList of Strings outputted from changeToString()
      */
-    private static ArrayList<String> changeArray(ArrayList<P_Properties> arrayOfObjects, String fileType) {
+    private static ArrayList<String> changeArray(ArrayList<CaptionProp> arrayOfObjects, String fileType) {
         ArrayList<String> concat = new ArrayList<>();
         switch (fileType.toLowerCase()) {
             case "csv" :
-                for (P_Properties p : arrayOfObjects) {
-                    concat.add(P_Properties.toStringCSV(p));
+                for (CaptionProp c : arrayOfObjects) {
+                    concat.add(CaptionProp.toStringCSV(c));
                 }
                 break;
             default:
-                for (P_Properties p : arrayOfObjects) {
-                    concat.add(P_Properties.toString(p));
+                for (CaptionProp c : arrayOfObjects) {
+                    concat.add(CaptionProp.toString(c));
                 }
                 break;
         }
@@ -325,10 +332,10 @@ public class Executor {
 
     /**
      *
-     * @param arrayForFile  ArrayList of P_Properties objects
+     * @param arrayForFile  ArrayList of CaptionProp objects
      * @see  "https://stackoverflow.com/a/2885224/7211793"
      */
-    private static void createDoc(String outputPath, String fileType, ArrayList<P_Properties> arrayForFile) {
+    private static void createDoc(String outputPath, String fileType, ArrayList<CaptionProp> arrayForFile) {
 
         String lineSep = System.getProperty("line.separator");
         // Path file = Paths.get(File.separator + "Users" + File.separator + "kash" + File.separator + "Desktop" + File.separator + "Testing.txt");

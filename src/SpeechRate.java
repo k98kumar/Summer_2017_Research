@@ -6,17 +6,17 @@ import java.util.TimeZone;
 /**
  * Created by kash on 6/11/17.
  */
-public class SpeechRate {
+class SpeechRate {
 
-    private ArrayList<P_Properties> capList;
+    private ArrayList<CaptionProp> capList;
     private String logFile;
 
-    public SpeechRate(ArrayList<P_Properties> capList, String logFile) {
+    public SpeechRate(ArrayList<CaptionProp> capList, String logFile) {
         this.capList = capList;
         this.logFile = logFile;
     }
 
-    private Logging logger = new Logging(-1, -1);
+    private Logging loggerSpeech = new Logging(-1, -1);
 
     /**
      * Uses an arrayList as a parameter, in constructor.
@@ -29,14 +29,14 @@ public class SpeechRate {
      */
     public ArrayList<Double> sepCapWPSec() throws Exception {
         ArrayList<Double> countArray = new ArrayList<>();
-        for (P_Properties thing : capList) {
+        for (CaptionProp thing : capList) {
             countArray.add( wordsInString(thing.getText()) / secondsElapsed(thing.getBegin(), thing.getEnd()) );
         }
         return countArray;
     }
 
     /**
-     * Uses ArrayList of P_Properties objects, taken from
+     * Uses ArrayList of CaptionProp objects, taken from
      * the constructor.
      *
      * @return  Total number of words divided by the
@@ -44,7 +44,7 @@ public class SpeechRate {
      */
     public double wholeWPSec() throws Exception {
         int count = 0;
-        for (P_Properties thing : capList) {
+        for (CaptionProp thing : capList) {
             count += wordsInString(thing.getText());
         }
         return count / secondsElapsed( capList.get(0).getBegin(), capList.get(capList.size() - 1).getEnd() );

@@ -4,23 +4,25 @@ import java.util.Arrays;
 /**
  * Created by kash on 7/1/17.
  */
-public class AnalyzePronouns {
+class AnalyzePronouns {
 
-    public String[] persArr = {"I", "me", "myself"};
-    public String[] audArr = {"you", "yourself", "yourselves", "we"};
-    public String[] thirdArr = {"his", "her", "himself", "herself", "them", "themselves", "they"};
+    public int personalPronounCount, audiencePronounCount, thirdPersonPronounCount;
+    public ArrayList<PronounCount> personalPronounArray, audiencePronounArray, thirdPersonPronounArray = new ArrayList<>();
+
+
+    private String[] persArr = {"I", "me", "myself"};
+    private String[] audArr = {"you", "yourself", "yourselves", "we"};
+    private String[] thirdArr = {"his", "her", "himself", "herself", "them", "themselves", "they"};
 
     private String captions;
     private String logFile;
 
-
-
-    public AnalyzePronouns(String captions, String logFile) {
+    AnalyzePronouns(String captions, String logFile) {
         this.captions = captions;
         this.logFile = logFile;
     }
 
-    Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, null);
+    private Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, null);
 
     /*
        Search for the words when they are surrounded by spaces or when they are
@@ -29,16 +31,16 @@ public class AnalyzePronouns {
            |-> Look for " I " and " I."
      */
 
-    public void compAP() {
+    void compAP() {
         loggerPronouns.logFile = logFile;
-        loggerPronouns.personalArray = countTraverse(persArr);
-        loggerPronouns.personalPronouns = totalCount(loggerPronouns.personalArray);
+        personalPronounArray = loggerPronouns.personalArray = countTraverse(persArr);
+        personalPronounCount = loggerPronouns.personalPronouns = totalCount(loggerPronouns.personalArray);
         loggerPronouns.numberOfPersonalPronouns();
-        loggerPronouns.audienceArray = countTraverse(audArr);
-        loggerPronouns.audiencePronouns = totalCount(loggerPronouns.audienceArray);
+        audiencePronounArray = loggerPronouns.audienceArray = countTraverse(audArr);
+        audiencePronounCount = loggerPronouns.audiencePronouns = totalCount(loggerPronouns.audienceArray);
         loggerPronouns.numberOfAudiencePronouns();
-        loggerPronouns.thirdPersonArray = countTraverse(thirdArr);
-        loggerPronouns.thirdPersonPronouns = totalCount(loggerPronouns.thirdPersonArray);
+        thirdPersonPronounArray = loggerPronouns.thirdPersonArray = countTraverse(thirdArr);
+        thirdPersonPronounCount = loggerPronouns.thirdPersonPronouns = totalCount(loggerPronouns.thirdPersonArray);
         loggerPronouns.numberOfThirdPersonPronouns();
     }
 
@@ -47,7 +49,7 @@ public class AnalyzePronouns {
      * @param input
      * @return
      */
-    public ArrayList<PronounCount> countTraverse(String[] input) {
+    private ArrayList<PronounCount> countTraverse(String[] input) {
         ArrayList<PronounCount> arrCount = new ArrayList<>();
         for (String thing : input) {
             String spaceWordSpace = " " + thing + " ";
@@ -58,7 +60,7 @@ public class AnalyzePronouns {
         return arrCount;
     }
 
-    public int totalCount(ArrayList<PronounCount> input) {
+    private int totalCount(ArrayList<PronounCount> input) {
         int total = 0;
         for (PronounCount thing : input) {
             total += thing.getCount();
