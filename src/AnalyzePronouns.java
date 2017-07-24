@@ -16,13 +16,17 @@ class AnalyzePronouns {
 
     private String captions;
     private String logFile;
+    private String outputFile;
 
-    AnalyzePronouns(String captions, String logFile) {
+    AnalyzePronouns(String captions, String logFile, String outputFile) {
         this.captions = captions;
         this.logFile = logFile;
+        this.outputFile = outputFile;
     }
 
     private Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, null);
+    private Output output = new Output(0, null, 0, null, 0, null, null);
+
 
     /*
        Search for the words when they are surrounded by spaces or when they are
@@ -33,15 +37,17 @@ class AnalyzePronouns {
 
     void compAP() {
         loggerPronouns.logFile = logFile;
-        personalPronounArray = loggerPronouns.personalArray = countTraverse(persArr);
-        personalPronounCount = loggerPronouns.personalPronouns = totalCount(loggerPronouns.personalArray);
+        output.outputFile = outputFile;
+        personalPronounArray = loggerPronouns.personalArray = output.personalArray = countTraverse(persArr);
+        personalPronounCount = loggerPronouns.personalPronouns = output.personalPronouns = totalCount(loggerPronouns.personalArray);
         loggerPronouns.numberOfPersonalPronouns();
-        audiencePronounArray = loggerPronouns.audienceArray = countTraverse(audArr);
-        audiencePronounCount = loggerPronouns.audiencePronouns = totalCount(loggerPronouns.audienceArray);
+        audiencePronounArray = loggerPronouns.audienceArray = output.audienceArray = countTraverse(audArr);
+        audiencePronounCount = loggerPronouns.audiencePronouns = output.audiencePronouns = totalCount(loggerPronouns.audienceArray);
         loggerPronouns.numberOfAudiencePronouns();
-        thirdPersonPronounArray = loggerPronouns.thirdPersonArray = countTraverse(thirdArr);
-        thirdPersonPronounCount = loggerPronouns.thirdPersonPronouns = totalCount(loggerPronouns.thirdPersonArray);
+        thirdPersonPronounArray = loggerPronouns.thirdPersonArray = output.thirdPersonArray = countTraverse(thirdArr);
+        thirdPersonPronounCount = loggerPronouns.thirdPersonPronouns = output.thirdPersonPronouns = totalCount(loggerPronouns.thirdPersonArray);
         loggerPronouns.numberOfThirdPersonPronouns();
+        output.printEverything();
     }
 
     /**

@@ -24,6 +24,10 @@ public class Logging {
     ArrayList<PronounCount> thirdPersonArray;
     String logFile;
 
+    /**
+     * To show what file to insert logs
+     * @param logFile log file
+     */
     Logging(String logFile) {
         this.logFile = logFile;
     }
@@ -55,38 +59,38 @@ public class Logging {
     }
 
     // START Overall Log Methods
-    public void startProgram() {
-        String timeStamp = currentDateTimeString() + "Started Analyzing Document\n\n";
+    void startProgram() {
+        String timeStamp = currentDateTimeString() + "Started Analyzing " + getfileName(logFile) + "\n\n";
         appendIntoFile(logFile, timeStamp);
     }
 
-    public void finishedParsingDoc() {
-        String timeStamp = currentDateTimeString() + "Finished Parsing Document\n\n";
+    void finishedParsingDoc() {
+        String timeStamp = currentDateTimeString() + "Finished Parsing " + getfileName(logFile) + "\n\n";
         appendIntoFile(logFile, timeStamp);
     }
 
-    public void endProgram() {
-        String timeStamp = currentDateTimeString() + "Finished Analyzing Document\n\n";
+    void endProgram() {
+        String timeStamp = currentDateTimeString() + "Finished Analyzing " + getfileName(logFile) + "\n\n---\n\n";
         appendIntoFile(logFile, timeStamp);
     }
     // END Overall Log Methods
 
     // START SpeechRate.java
-    public void finishedCountingWords() {
+    void finishedCountingWords() {
         String label = "Number of Words Spoken:\t";
         label += numberOfWords + "\n\n";
         String timeStamp = currentDateTimeString() + "Words Spoken Calculated\n";
         appendIntoFile(logFile, timeStamp + label);
     }
 
-    public void calculatedTimeSpoken() {
+    void calculatedTimeSpoken() {
         String label = "Amount of Time Spoken:\t";
         label += secondsSpoken + "sec\n\n";
         String timeStamp = currentDateTimeString() + "Time Spoken Calculated\n";
         appendIntoFile(logFile, timeStamp + label);
     }
 
-    public void calculatedAverageRateOfSpeech() {
+    void calculatedAverageRateOfSpeech() {
         String label = "Average Rate of Speech:\t";
         label += numberOfWords / secondsSpoken + "words/sec\n\n";
         String timeStamp = currentDateTimeString() + "Rate of Speech Calculated\n";
@@ -95,33 +99,33 @@ public class Logging {
     // END SpeechRate.java
 
     // START AnalyzePronouns.java
-    public void numberOfPersonalPronouns() {
-        String label = "Number of Personal Pronouns:\t";
+    void numberOfPersonalPronouns() {
+        String label = "Number of Personal Pronouns: ";
         label += personalPronouns + "\n";
         for (PronounCount thing : personalArray) {
-            label += "\t" + thing.getPronoun() + ":\t" + thing.getCount() + "\n";
+            label += "\t" + thing.getPronoun() + ": " + thing.getCount() + "\n";
         }
         label += "\n";
         String timeStamp = currentDateTimeString() + "Personal Pronouns Totalled\n";
         appendIntoFile(logFile, timeStamp + label);
     }
 
-    public void numberOfAudiencePronouns() {
-        String label = "Number of Audience Pronouns:\t";
+    void numberOfAudiencePronouns() {
+        String label = "Number of Audience Pronouns: ";
         label += audiencePronouns + "\n";
         for (PronounCount thing : audienceArray) {
-            label += "\t" + thing.getPronoun() + ":\t" + thing.getCount() + "\n";
+            label += "\t" + thing.getPronoun() + ": " + thing.getCount() + "\n";
         }
         label += "\n";
         String timeStamp = currentDateTimeString() + "Audience Pronouns Totalled\n";
         appendIntoFile(logFile, timeStamp + label);
     }
 
-    public void numberOfThirdPersonPronouns() {
-        String label = "Number of Third Person Pronouns:\t";
+    void numberOfThirdPersonPronouns() {
+        String label = "Number of Third Person Pronouns: ";
         label += thirdPersonPronouns + "\n";
         for (PronounCount thing : thirdPersonArray) {
-            label += "\t" + thing.getPronoun() + ":\t" + thing.getCount() + "\n";
+            label += "\t" + thing.getPronoun() + ": " + thing.getCount() + "\n";
         }
         label += "\n";
         String timeStamp = currentDateTimeString() + "Third Person Pronouns Totalled\n";
@@ -136,7 +140,7 @@ public class Logging {
         return DF.format(date) + " | ";
     }
 
-    private void appendIntoFile(String filePath, String text) {
+    static void appendIntoFile(String filePath, String text) {
         Path path = Paths.get(filePath);
         File file = new File(filePath);
         try {
@@ -148,6 +152,10 @@ public class Logging {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getfileName(String file) {
+        return file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     }
     // END Helper Methods
 

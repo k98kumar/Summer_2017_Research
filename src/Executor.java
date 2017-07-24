@@ -13,17 +13,13 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
-import java.util.TimeZone;
+import java.util.*;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * Created by Koushhik Kumar on 5/28/17.
@@ -41,10 +37,8 @@ public class Executor {
 
     /**
      *
-     * @param args  First Argument:  Whether the input xml is in a file or URL
-     *              Second Argument: The file or URL (pick which is specified)
-     *              Third Argument:  Where output should be written
-     *              Fourth Argument: Location of the log file
+     * @param args  First Argument:  Whether the input xml is in a file, folder, or URL
+     *              Second Argument: The path of the file, folder, or URL
      * @throws IOException
      * @throws org.xml.sax.SAXException
      * @throws ParseException
@@ -54,17 +48,62 @@ public class Executor {
     public static void main(String[] args) throws IOException, org.xml.sax.SAXException, ParseException, ParserConfigurationException {
 
         // START Arguments to variables
-        String fileOrURL = args[0];
-        String pathName = args[1];
-        String outputFile = args[2];
-        String logFile = args[3];
+        String fileFolderURL = args[0];
+        String path = args[1];
         // END Arguments to variable
 
-        /*Scanner input = new Scanner(System.in);
-        if (new File(logFile).exists()) {
-            System.out.println("File Exists. Delete this file? (Y or N)");
-            if (input.nextLine().equals("Y")) Files.delete(Paths.get(logFile));
-        }*/
+        String organizedFile;
+        String logFile;
+        String outputFile;
+        String fileToString;
+
+        Path source = Paths.get(path);
+        Path output;
+
+        switch (fileFolderURL.toLowerCase()) {
+            case "file" :
+                logFile = path.substring(0, path.lastIndexOf('.')) + "_logger.txt";
+                organizedFile = createOrganizedFilePath(path, true);
+                outputFile = createOutputFilePath(path, true);
+                fileActionIndividual(path, organizedFile, logFile, outputFile);
+                break;
+            case "folder" :
+                File folderPath = new File(path);
+                if (path.endsWith("/")) logFile = path + "logs.txt";
+                else logFile = path + "/logs.txt";
+                if (new File(logFile).exists()) Files.delete(Paths.get(logFile));
+                for (File fileEntry : folderPath.listFiles()) {
+                    if (fileEntry.getName().equals(".DS_Store")) {
+                        Files.delete(Paths.get(fileEntry.getPath()));
+                        continue;
+                    }
+                    fileToString = fileEntry.getPath();// + "/";
+                    makeDirectoryAtParent(fileToString); // Makes folder and has "/" at the end
+                    // organizedFile = createOrganizedFilePath(path, false); // Creates filepath in new folder
+                    organizedFile = createOrganizedFilePath(fileToString, false); // Creates filepath in new folder
+                    // outputFile = createOutputFilePath(path, false);
+                    outputFile = createOutputFilePath(fileToString, false);
+                    fileActionFolder(fileToString, organizedFile, logFile, outputFile);
+                    output = Paths.get(getMovedFilePath(fileToString));
+                    // Files.move(source, output, REPLACE_EXISTING);
+                }
+                break;
+            case "url" :
+                fileActionURL();
+                break;
+            default :
+                break;
+        }
+
+    }
+
+    /*
+    private static void storeCodeForUse() {
+        // Scanner input = new Scanner(System.in);
+        // if (new File(logFile).exists()) {
+        //     System.out.println("File Exists. Delete this file? (Y or N)");
+        //     if (input.nextLine().equals("Y")) Files.delete(Paths.get(logFile));
+        // }
 
         // START Delete file if exists
         Files.delete(Paths.get(logFile));
@@ -74,7 +113,7 @@ public class Executor {
         programLogs.startProgram();
 
         // START Analyze argument
-        String outputFileType = outputFile.substring(outputFile.lastIndexOf('.') + 1);
+        String organizedFileType = organizedFile.substring(organizedFile.lastIndexOf('.') + 1);
         String logFileType = logFile.substring(logFile.lastIndexOf('.') + 1);
         // END Analyze argument
 
@@ -88,7 +127,7 @@ public class Executor {
 
         // START Create the document
         Document doc;
-        switch (fileOrURL.toLowerCase()) {
+        switch (fileFolderURL.toLowerCase()) {
             case "file":
                 if (checkForBOM(new File(pathName)))
                     doc = convertFileToDoc(circumvent(new File(pathName)));
@@ -106,7 +145,7 @@ public class Executor {
 
         // START Create the file in the location specified
         propArray = extract(doc);
-        createDoc(outputFile, outputFileType, propArray);
+        createDoc(organizedFile, organizedFileType, propArray);
         // END Create the file in the location specified
 
         // START Doc parse end log
@@ -125,7 +164,120 @@ public class Executor {
         // START Program end
         programLogs.endProgram();
         // END Program end
+    }
+    */
 
+    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile)
+            throws IOException, ParseException, SAXException, ParserConfigurationException {
+        // Scanner input = new Scanner(System.in);
+        // if (new File(logFile).exists()) {
+        //     System.out.println("File Exists. Delete this file? (Y or N)");
+        //     if (input.nextLine().equals("Y")) Files.delete(Paths.get(logFile));
+        // }
+
+        // START Delete file if exists
+        // if (new File(logFile).exists()) Files.delete(Paths.get(logFile));
+        // END Delete file if exists
+
+        Logging programLogs = new Logging(logFile);
+        programLogs.startProgram();
+
+        // START Analyze argument
+        String organizedFileType = organizedFile.substring(organizedFile.lastIndexOf('.') + 1);
+        String logFileType = logFile.substring(logFile.lastIndexOf('.') + 1);
+        // END Analyze argument
+
+        // START Create a path
+        Path path = Paths.get(pathName);
+        Charset charset = StandardCharsets.UTF_8;
+        String fileString = new String(Files.readAllBytes(path), charset);
+        fileString = fileString.replaceAll("<br/>", "").replaceAll("&apos;", "'").replaceAll("[^\\x20-\\x7e]", "");
+        Files.write(path, fileString.getBytes(charset));
+        // END Create a path
+
+        // START Create the document
+        Document doc;
+        if (checkForBOM(new File(pathName))) doc = convertFileToDoc(circumvent(new File(pathName)));
+        else doc = convertFileToDoc(pathName);
+        // END Create the document
+
+        // START Create the file in the location specified
+        propArray = extract(doc);
+        createDoc(organizedFile, organizedFileType, propArray);
+        // END Create the file in the location specified
+
+        // START Doc parse end log
+        programLogs.finishedParsingDoc();
+        // END Doc parse end log
+
+        // START Speech Rate
+        SpeechRate SR = new SpeechRate(propArray, logFile);
+        // END Speech Rate
+
+        // START Analyzing Pronouns
+        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile);
+        AP.compAP();
+        // END Analyzing Pronouns
+
+        // START Program end
+        programLogs.endProgram();
+        // END Program end
+    }
+
+    private static void fileActionIndividual(String pathName, String organizedFile, String logFile, String outputFile)
+            throws IOException, ParseException, SAXException, ParserConfigurationException {
+
+        // START Delete file if exists
+        if (new File(logFile).exists()) Files.delete(Paths.get(logFile));
+        // END Delete file if exists
+
+        Logging programLogs = new Logging(logFile);
+        programLogs.startProgram();
+
+        // START Analyze argument
+        String organizedFileType = organizedFile.substring(organizedFile.lastIndexOf('.') + 1);
+        // END Analyze argument
+
+        // START Create a path
+        Path path = Paths.get(pathName);
+        Charset charset = StandardCharsets.UTF_8;
+        String fileString = new String(Files.readAllBytes(path), charset);
+        fileString = fileString.replaceAll("<br/>", "").replaceAll("&apos;", "'").replaceAll("[^\\x20-\\x7e]", "");
+        Files.write(path, fileString.getBytes(charset));
+        // END Create a path
+
+        // START Create the document
+        Document doc;
+        if (checkForBOM(new File(pathName)))
+            doc = convertFileToDoc(circumvent(new File(pathName)));
+        else
+            doc = convertFileToDoc(pathName);
+        // END Create the document
+
+        // START Create the file in the location specified
+        propArray = extract(doc);
+        createDoc(organizedFile, organizedFileType, propArray);
+        // END Create the file in the location specified
+
+        // START Doc parse end log
+        programLogs.finishedParsingDoc();
+        // END Doc parse end log
+
+        // START Speech Rate
+        SpeechRate SR = new SpeechRate(propArray, logFile);
+        // END Speech Rate
+
+        // START Analyzing Pronouns
+        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile);
+        AP.compAP();
+        // END Analyzing Pronouns
+
+        // START Program end
+        programLogs.endProgram();
+        // END Program end
+    }
+
+    private static void fileActionURL() {
     }
 
     /**
@@ -198,6 +350,8 @@ public class Executor {
     private static String circumvent(File originalFile) throws IOException {
 
         String outputPath = File.separator + "Users" + File.separator + "kash" + File.separator + "Desktop" + File.separator + "Overwrite_Input.xml";
+        // String inputFilePath = originalFile.getPath();
+        // String outputPath = inputFilePath.substring(0, inputFilePath.lastIndexOf(".")) + "/" + getFileName(inputFilePath) + "_overwrite" + inputFilePath.substring(inputFilePath.lastIndexOf("."));
 
         File output = new File(outputPath);
 
@@ -234,9 +388,9 @@ public class Executor {
     private static Document convertFileToDoc(String pathToFile) throws IOException, ParserConfigurationException, SAXException {
 
         File file = new File(pathToFile);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        return db.parse(file);
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        return documentBuilder.parse(file);
 
     }
 
@@ -250,10 +404,10 @@ public class Executor {
      */
     private static Document convertURLToDoc(String urlToCode) throws IOException, SAXException {
 
-        DOMParser dp = new DOMParser();
+        DOMParser domParser = new DOMParser();
         URL someURL = new URL(urlToCode);
-        dp.parse(new org.xml.sax.InputSource(someURL.openStream()));
-        return dp.getDocument();
+        domParser.parse(new org.xml.sax.InputSource(someURL.openStream()));
+        return domParser.getDocument();
     }
 
     /**
@@ -307,25 +461,15 @@ public class Executor {
     }
 
     /**
-     * Uses toStringCSV() to convert the Strings to comma-separated values
      * Uses toString() to convert the Strings to string for text files
      * @param arrayOfObjects  ArrayList of CaptionProp objects created from XML
      * @return  ArrayList of Strings outputted from changeToString()
      */
     private static ArrayList<String> changeArray(ArrayList<CaptionProp> arrayOfObjects, String fileType) {
         ArrayList<String> concat = new ArrayList<>();
-        switch (fileType.toLowerCase()) {
-            case "csv" :
-                for (CaptionProp c : arrayOfObjects) {
-                    concat.add(CaptionProp.toStringCSV(c));
-                }
-                break;
-            default:
-                for (CaptionProp c : arrayOfObjects) {
-                    concat.add(CaptionProp.toString(c));
-                }
-                break;
-        }
+            for (CaptionProp c : arrayOfObjects) {
+                concat.add(CaptionProp.toString(c));
+            }
 
         return concat;
     }
@@ -343,15 +487,33 @@ public class Executor {
         try {
             ArrayList<String> captionList = changeArray(arrayForFile, fileType);
             // captionList.add(0, captions + lineSep + lineSep);
-            if (fileType.equals("docx") || fileType.equals("doc")) {
-
-            } else {
-                Files.write(file, captionList, Charset.forName("UTF-8"));
-            }
+            Files.write(file, captionList, Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed");
         }
+    }
+
+    private static String getFileName(String file) {
+        return file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
+    }
+
+    private static String createOrganizedFilePath(String file, boolean isIndividual) {
+        if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + "_organized.txt";
+        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + "_organized.txt";
+    }
+
+    private static String createOutputFilePath(String file, boolean isIndividual) {
+        if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + "_output.txt";
+        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + "_output.txt";
+    }
+
+    private static void makeDirectoryAtParent(String file) {
+        new File(file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/").mkdir();
+    }
+
+    private static String getMovedFilePath(String file) {
+        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + file.substring(file.lastIndexOf('/') + 1);
     }
 
 }
