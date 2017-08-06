@@ -57,11 +57,11 @@ class AnalyzePronouns {
      */
     private ArrayList<PronounCount> countTraverse(String[] input) {
         ArrayList<PronounCount> arrCount = new ArrayList<>();
-        for (String thing : input) {
-            String spaceWordSpace = " " + thing + " ";
-            String spaceWordPeriod = " " + thing + ".";
+        for (String str : input) {
+            String spaceWordSpace = " " + str + " ";
+            String spaceWordPeriod = " " + str + ".";
             int count = countMatches(captions, spaceWordSpace) + countMatches(captions, spaceWordPeriod);
-            arrCount.add(new PronounCount(thing, count));
+            arrCount.add(new PronounCount(str, count));
         }
         return arrCount;
     }

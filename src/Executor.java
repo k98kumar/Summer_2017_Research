@@ -57,7 +57,7 @@ public class Executor {
         String outputFile;
         String fileToString;
 
-        Path source = Paths.get(path);
+        Path source;
         Path output;
 
         switch (fileFolderURL.toLowerCase()) {
@@ -71,21 +71,38 @@ public class Executor {
                 File folderPath = new File(path);
                 if (path.endsWith("/")) logFile = path + "logs.txt";
                 else logFile = path + "/logs.txt";
-                if (new File(logFile).exists()) Files.delete(Paths.get(logFile));
+                if (new File(logFile).exists())
+                    Files.delete(Paths.get(logFile));
+                for (File fileFolder : folderPath.listFiles()) {
+                    try {
+                        if (fileFolder.isDirectory()) Files.delete(Paths.get(fileFolder.getPath()));
+                    } catch (DirectoryNotEmptyException e) {
+                        for (File fileInFolder : fileFolder.listFiles()) {
+                            fileInFolder.delete();
+                        }
+                    }
+                }
+                for (File allOthers : folderPath.listFiles()) {
+                    if (!allOthers.getPath().endsWith(".xml")) {
+                        Files.delete(Paths.get(allOthers.getPath()));
+                    }
+                }
                 for (File fileEntry : folderPath.listFiles()) {
                     if (fileEntry.getName().equals(".DS_Store")) {
                         Files.delete(Paths.get(fileEntry.getPath()));
                         continue;
                     }
+                    if (fileEntry.isDirectory()) continue;
                     fileToString = fileEntry.getPath();// + "/";
+                    source = Paths.get(fileToString);
                     makeDirectoryAtParent(fileToString); // Makes folder and has "/" at the end
-                    // organizedFile = createOrganizedFilePath(path, false); // Creates filepath in new folder
                     organizedFile = createOrganizedFilePath(fileToString, false); // Creates filepath in new folder
-                    // outputFile = createOutputFilePath(path, false);
                     outputFile = createOutputFilePath(fileToString, false);
                     fileActionFolder(fileToString, organizedFile, logFile, outputFile);
                     output = Paths.get(getMovedFilePath(fileToString));
-                    // Files.move(source, output, REPLACE_EXISTING);
+                    // + ------------- Keep this commented -------------- +
+                    // |   Files.move(source, output, REPLACE_EXISTING);  |
+                    // + ------------- Keep this commented -------------- +
                 }
                 break;
             case "url" :
@@ -416,6 +433,7 @@ public class Executor {
      * @return  String of text in certain tags
      * @throws org.xml.sax.SAXException  parse() method throws exception
      * @throws IOException  extract() method throws exception
+     * @throws ParseException  returnDateDifference() throws exception
      * @see  "https://stackoverflow.com/a/7902162"
      */
     private static ArrayList<CaptionProp> extract(Document doc) throws org.xml.sax.SAXException, IOException, ParseException {
@@ -426,24 +444,24 @@ public class Executor {
         for (int i = 0; i < nl.getLength(); i++) {
 
             Node node = nl.item(i);
-            NamedNodeMap nnm = node.getAttributes();
+            NamedNodeMap namedNodeMap = node.getAttributes();
 
-            String begin = nnm.getNamedItem("begin").getTextContent();
-
-            String end = nnm.getNamedItem("end").getTextContent();
-
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
-            sdf.setTimeZone(TimeZone.getTimeZone("CST")); // No Offset
-            Date dateBegin = sdf.parse(begin);
-            Date dateEnd = sdf.parse(end);
-            long difference = dateEnd.getTime() - dateBegin.getTime();
-            Date date = new Date(difference - 64800000);
-            DateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
-            String dateFormatted = formatter.format(date);
-
-            String region = nnm.getNamedItem("region").getTextContent();
-
+            String begin = namedNodeMap.getNamedItem("begin").getTextContent();
+            String end = namedNodeMap.getNamedItem("end").getTextContent();
+            String dateFormatted = returnDateDifference("HH:mm:ss.SSS", begin, end);
+            String region = "unspecified";
             String text;
+
+            /*
+            if (!namedNodeMap.getNamedItem("region").getTextContent().equals("")) {// && !namedNodeMap.getNamedItem("region").getTextContent() == null) {
+                region = "unspecified";
+            } else {
+                region = namedNodeMap.getNamedItem("region").getTextContent();
+            }
+            */
+
+            if (checkAttributeExists(namedNodeMap, "region")) region = namedNodeMap.getNamedItem("region").getTextContent();;
+
             Node desc = node.getFirstChild();
             if (desc != null) {
                 text = desc.getNodeValue();
@@ -461,6 +479,40 @@ public class Executor {
     }
 
     /**
+     * Checks if attribute in a tag of a given name exits
+     * @param nodeMap  NamedNodeMap of single "p" tag
+     * @param name  Name of attribute
+     * @return  Boolean indicating whether specified attribute exists
+     */
+    private static boolean checkAttributeExists(NamedNodeMap nodeMap, String name) {
+        int length = nodeMap.getLength();
+        for (int i = 0; i < length; i++) {
+            Node n = nodeMap.item(i);
+                if (name.equals(n.getNodeName())) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Finds the difference in times
+     * @param sdfPattern  The pattern SimpleDateFormat requires
+     * @param begin  String representation of start time in SDF format
+     * @param end String representation of end time in SDF format
+     * @return String representation of time difference in SDF format
+     * @throws ParseException exception that SimpleDateFormat.parse() throws
+     */
+    private static String returnDateDifference(String sdfPattern, String begin, String end) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(sdfPattern);
+        sdf.setTimeZone(TimeZone.getTimeZone("CST")); // No Offset
+        Date dateBegin = sdf.parse(begin);
+        Date dateEnd = sdf.parse(end);
+        long difference = dateEnd.getTime() - dateBegin.getTime();
+        Date date = new Date(difference - 64800000);
+        DateFormat formatter = new SimpleDateFormat(sdfPattern);
+        return formatter.format(date);
+    }
+
+    /**
      * Uses toString() to convert the Strings to string for text files
      * @param arrayOfObjects  ArrayList of CaptionProp objects created from XML
      * @return  ArrayList of Strings outputted from changeToString()
@@ -470,7 +522,6 @@ public class Executor {
             for (CaptionProp c : arrayOfObjects) {
                 concat.add(CaptionProp.toString(c));
             }
-
         return concat;
     }
 
