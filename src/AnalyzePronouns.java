@@ -17,6 +17,14 @@ class AnalyzePronouns {
     private String captions;
     private String logFile;
     private String outputFile;
+    private String outputFile_list;
+
+    AnalyzePronouns(String captions, String logFile, String outputFile, String outputFile_list) {
+        this.captions = captions;
+        this.logFile = logFile;
+        this.outputFile = outputFile;
+        this.outputFile_list = outputFile_list;
+    }
 
     AnalyzePronouns(String captions, String logFile, String outputFile) {
         this.captions = captions;
@@ -25,7 +33,7 @@ class AnalyzePronouns {
     }
 
     private Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, null);
-    private Output output = new Output(0, null, 0, null, 0, null, null);
+    private Output output = new Output(0, null, 0, null, 0, null, null, null);
 
 
     /*
@@ -38,6 +46,7 @@ class AnalyzePronouns {
     void compAP() {
         loggerPronouns.logFile = logFile;
         output.outputFile = outputFile;
+        output.outputFile_list = outputFile_list;
         personalPronounArray = loggerPronouns.personalArray = output.personalArray = countTraverse(persArr);
         personalPronounCount = loggerPronouns.personalPronouns = output.personalPronouns = totalCount(loggerPronouns.personalArray);
         loggerPronouns.numberOfPersonalPronouns();
@@ -48,6 +57,10 @@ class AnalyzePronouns {
         thirdPersonPronounCount = loggerPronouns.thirdPersonPronouns = output.thirdPersonPronouns = totalCount(loggerPronouns.thirdPersonArray);
         loggerPronouns.numberOfThirdPersonPronouns();
         output.printEverything();
+    }
+
+    void compAPNoLog() {
+
     }
 
     /**

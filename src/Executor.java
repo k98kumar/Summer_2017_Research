@@ -34,6 +34,9 @@ public class Executor {
 
     private static String captions = "";
     private static ArrayList<CaptionProp> propArray = new ArrayList<>();
+    private static final String TXT = ".txt";
+    private static final String _OUTPUT = "_output";
+    private static final String _ORGANIZED = "_organized";
 
     /**
      *
@@ -57,20 +60,23 @@ public class Executor {
         String outputFile;
         String fileToString;
 
+        String cumulFolderOutput_list;
+        String outputFile_list;
+
         Path source;
         Path output;
 
         switch (fileFolderURL.toLowerCase()) {
             case "file" :
-                logFile = path.substring(0, path.lastIndexOf('.')) + "_logger.txt";
+                logFile = path.substring(0, path.lastIndexOf('.')) + "_logger" + TXT;
                 organizedFile = createOrganizedFilePath(path, true);
                 outputFile = createOutputFilePath(path, true);
                 fileActionIndividual(path, organizedFile, logFile, outputFile);
                 break;
             case "folder" :
                 File folderPath = new File(path);
-                if (path.endsWith("/")) logFile = path + "logs.txt";
-                else logFile = path + "/logs.txt";
+                if (path.endsWith("/")) logFile = path + "logs" + TXT;
+                else logFile = path + "/logs" + TXT;
                 if (new File(logFile).exists())
                     Files.delete(Paths.get(logFile));
                 for (File fileFolder : folderPath.listFiles()) {
@@ -87,6 +93,7 @@ public class Executor {
                         Files.delete(Paths.get(allOthers.getPath()));
                     }
                 }
+                cumulFolderOutput_list = makeOutputDirectory(path);
                 for (File fileEntry : folderPath.listFiles()) {
                     if (fileEntry.getName().equals(".DS_Store")) {
                         Files.delete(Paths.get(fileEntry.getPath()));
@@ -94,15 +101,18 @@ public class Executor {
                     }
                     if (fileEntry.isDirectory()) continue;
                     fileToString = fileEntry.getPath();// + "/";
-                    source = Paths.get(fileToString);
                     makeDirectoryAtParent(fileToString); // Makes folder and has "/" at the end
                     organizedFile = createOrganizedFilePath(fileToString, false); // Creates filepath in new folder
                     outputFile = createOutputFilePath(fileToString, false);
-                    fileActionFolder(fileToString, organizedFile, logFile, outputFile);
-                    output = Paths.get(getMovedFilePath(fileToString));
-                    // + ------------- Keep this commented -------------- +
-                    // |   Files.move(source, output, REPLACE_EXISTING);  |
-                    // + ------------- Keep this commented -------------- +
+                    outputFile_list = cumulFolderOutput_list + getFileName(fileToString) + TXT;
+
+                    fileActionFolder(fileToString, organizedFile, logFile, outputFile, outputFile_list);
+
+                    // + ---------------- Keep this commented ---------------- +
+                    // |           source = Paths.get(fileToString);           |
+                    // |  output = Paths.get(getMovedFilePath(fileToString));  |
+                    // |     Files.move(source, output, REPLACE_EXISTING);     |
+                    // + ---------------- Keep this commented ---------------- +
                 }
                 break;
             case "url" :
@@ -184,7 +194,7 @@ public class Executor {
     }
     */
 
-    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile)
+    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile, String outputFile_list)
             throws IOException, ParseException, SAXException, ParserConfigurationException {
         // Scanner input = new Scanner(System.in);
         // if (new File(logFile).exists()) {
@@ -232,7 +242,7 @@ public class Executor {
         // END Speech Rate
 
         // START Analyzing Pronouns
-        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile);
+        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile, outputFile_list);
         AP.compAP();
         // END Analyzing Pronouns
 
@@ -452,14 +462,6 @@ public class Executor {
             String region = "unspecified";
             String text;
 
-            /*
-            if (!namedNodeMap.getNamedItem("region").getTextContent().equals("")) {// && !namedNodeMap.getNamedItem("region").getTextContent() == null) {
-                region = "unspecified";
-            } else {
-                region = namedNodeMap.getNamedItem("region").getTextContent();
-            }
-            */
-
             if (checkAttributeExists(namedNodeMap, "region")) region = namedNodeMap.getNamedItem("region").getTextContent();;
 
             Node desc = node.getFirstChild();
@@ -533,7 +535,6 @@ public class Executor {
     private static void createDoc(String outputPath, String fileType, ArrayList<CaptionProp> arrayForFile) {
 
         String lineSep = System.getProperty("line.separator");
-        // Path file = Paths.get(File.separator + "Users" + File.separator + "kash" + File.separator + "Desktop" + File.separator + "Testing.txt");
         Path file = Paths.get(outputPath);
         try {
             ArrayList<String> captionList = changeArray(arrayForFile, fileType);
@@ -550,13 +551,13 @@ public class Executor {
     }
 
     private static String createOrganizedFilePath(String file, boolean isIndividual) {
-        if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + "_organized.txt";
-        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + "_organized.txt";
+        if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + _ORGANIZED + TXT;
+        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + _ORGANIZED + TXT;
     }
 
     private static String createOutputFilePath(String file, boolean isIndividual) {
-        if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + "_output.txt";
-        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + "_output.txt";
+        if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + _OUTPUT + TXT;
+        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + _OUTPUT + TXT;
     }
 
     private static void makeDirectoryAtParent(String file) {
@@ -565,6 +566,15 @@ public class Executor {
 
     private static String getMovedFilePath(String file) {
         return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + file.substring(file.lastIndexOf('/') + 1);
+    }
+
+    private static String makeOutputDirectory(String folder) {
+        String newFolder = folder.endsWith("/") ? folder + "Output/" : folder + "/Output/";
+        File dir = new File(newFolder);
+        boolean success = dir.mkdir();
+        if (success) System.out.println("Successful");
+
+        return newFolder;
     }
 
 }
