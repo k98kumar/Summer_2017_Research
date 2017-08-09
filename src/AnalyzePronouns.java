@@ -7,8 +7,7 @@ import java.util.Arrays;
 class AnalyzePronouns {
 
     public int personalPronounCount, audiencePronounCount, thirdPersonPronounCount;
-    public ArrayList<PronounCount> personalPronounArray, audiencePronounArray, thirdPersonPronounArray = new ArrayList<>();
-
+    public ArrayList<PronounCount> personalPronounArray = new ArrayList<>(), audiencePronounArray = new ArrayList<>(), thirdPersonPronounArray = new ArrayList<>();
 
     private String[] persArr = {"I", "me", "myself"};
     private String[] audArr = {"you", "yourself", "yourselves", "we"};
@@ -40,10 +39,11 @@ class AnalyzePronouns {
        Search for the words when they are surrounded by spaces or when they are
        preceded by a space and are followed by a period.
        For example, looking for "I":
-           |-> Look for " I " and " I."
+           |-> Look for " I ", " I.", and " I'"
      */
 
     void compAP() {
+        personalPronounArray.clear(); audiencePronounArray.clear(); thirdPersonPronounArray.clear();
         loggerPronouns.logFile = logFile;
         output.outputFile = outputFile;
         output.outputFile_list = outputFile_list;
@@ -73,7 +73,8 @@ class AnalyzePronouns {
         for (String str : input) {
             String spaceWordSpace = " " + str + " ";
             String spaceWordPeriod = " " + str + ".";
-            int count = countMatches(captions, spaceWordSpace) + countMatches(captions, spaceWordPeriod);
+            String spaceWordApostrophe = " " + str + "'";
+            int count = countMatches(captions, spaceWordSpace) + countMatches(captions, spaceWordPeriod) + countMatches(captions, spaceWordApostrophe);
             arrCount.add(new PronounCount(str, count));
         }
         return arrCount;

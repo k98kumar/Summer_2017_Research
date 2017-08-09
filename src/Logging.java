@@ -60,17 +60,17 @@ public class Logging {
 
     // START Overall Log Methods
     void startProgram() {
-        String timeStamp = currentDateTimeString() + "Started Analyzing " + getfileName(logFile) + "\n\n";
+        String timeStamp = currentDateTimeString() + "Started Analyzing " + getFileName(logFile) + "\n\n";
         appendIntoFile(logFile, timeStamp);
     }
 
     void finishedParsingDoc() {
-        String timeStamp = currentDateTimeString() + "Finished Parsing " + getfileName(logFile) + "\n\n";
+        String timeStamp = currentDateTimeString() + "Finished Parsing " + getFileName(logFile) + "\n\n";
         appendIntoFile(logFile, timeStamp);
     }
 
     void endProgram() {
-        String timeStamp = currentDateTimeString() + "Finished Analyzing " + getfileName(logFile) + "\n\n---\n\n";
+        String timeStamp = currentDateTimeString() + "Finished Analyzing " + getFileName(logFile) + "\n\n---\n\n";
         appendIntoFile(logFile, timeStamp);
     }
     // END Overall Log Methods
@@ -154,7 +154,7 @@ public class Logging {
         }
     }
 
-    private String getfileName(String file) {
+    private String getFileName(String file) {
         return file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     }
     // END Helper Methods
