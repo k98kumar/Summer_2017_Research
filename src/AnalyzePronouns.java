@@ -11,7 +11,7 @@ class AnalyzePronouns {
 
     private String[] persArr = {"I", "me", "myself"};
     private String[] audArr = {"you", "yourself", "yourselves", "we"};
-    private String[] thirdArr = {"his", "her", "himself", "herself", "them", "themselves", "they"};
+    private String[] thirdArr = {"he", "his", "her", "himself", "herself", "them", "themselves", "they"};
 
     private String captions;
     private String logFile;
@@ -83,7 +83,7 @@ class AnalyzePronouns {
             String spaceWordSpace = " " + str + " ";
             String spaceWordPeriod = " " + str + ".";
             String spaceWordApostrophe = " " + str + "'";
-            int count = countMatches(captions, spaceWordSpace) + countMatches(captions, spaceWordPeriod) + countMatches(captions, spaceWordApostrophe);
+            int count = countMatches(captions.toLowerCase(), spaceWordSpace) + countMatches(captions.toLowerCase(), spaceWordPeriod) + countMatches(captions.toLowerCase(), spaceWordApostrophe);
             arrCount.add(new PronounCount(str, count));
         }
         return arrCount;

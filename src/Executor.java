@@ -189,6 +189,8 @@ public class Executor {
         // START Program end
         programLogs.endProgram();
         // END Program end
+
+        captions = "";
     }
 
     /**
