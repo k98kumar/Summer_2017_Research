@@ -136,15 +136,6 @@ public class Executor {
      */
     private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile, String outputFile_list)
             throws IOException, ParseException, SAXException, ParserConfigurationException {
-        // Scanner input = new Scanner(System.in);
-        // if (new File(logFile).exists()) {
-        //     System.out.println("File Exists. Delete this file? (Y or N)");
-        //     if (input.nextLine().equals("Y")) Files.delete(Paths.get(logFile));
-        // }
-
-        // START Delete file if exists
-        // if (new File(logFile).exists()) Files.delete(Paths.get(logFile));
-        // END Delete file if exists
 
         Logging programLogs = new Logging(logFile);
         programLogs.startProgram();
@@ -330,9 +321,7 @@ public class Executor {
     private static String circumvent(File originalFile) throws IOException {
 
         String outputPath = File.separator + "Users" + File.separator + "kash" + File.separator + "Desktop" + File.separator + "Overwrite_Input.xml";
-        // String inputFilePath = originalFile.getPath();
-        // String outputPath = inputFilePath.substring(0, inputFilePath.lastIndexOf(".")) + "/" + getFileName(inputFilePath) + "_overwrite" + inputFilePath.substring(inputFilePath.lastIndexOf("."));
-
+        
         File output = new File(outputPath);
 
         FileChannel source = null;
