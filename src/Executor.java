@@ -39,13 +39,12 @@ public class Executor {
     private static final String _ORGANIZED = "_organized";
 
     /**
-     *
      * @param args  First Argument:  Whether the input xml is in a file, folder, or URL
      *              Second Argument: The path of the file, folder, or URL
-     * @throws IOException
-     * @throws org.xml.sax.SAXException
-     * @throws ParseException
-     * @throws ParserConfigurationException
+     * @throws IOException                   IOException
+     * @throws org.xml.sax.SAXException      SAXException
+     * @throws ParseException                ParseException
+     * @throws ParserConfigurationException  ParserConfigurationException
      * @see  "https://stackoverflow.com/a/3936452/7211793"
      */
     public static void main(String[] args) throws IOException, org.xml.sax.SAXException, ParseException, ParserConfigurationException {
@@ -124,76 +123,17 @@ public class Executor {
 
     }
 
-    /*
-    private static void storeCodeForUse() {
-        // Scanner input = new Scanner(System.in);
-        // if (new File(logFile).exists()) {
-        //     System.out.println("File Exists. Delete this file? (Y or N)");
-        //     if (input.nextLine().equals("Y")) Files.delete(Paths.get(logFile));
-        // }
-
-        // START Delete file if exists
-        Files.delete(Paths.get(logFile));
-        // END Delete file if exists
-
-        Logging programLogs = new Logging(logFile);
-        programLogs.startProgram();
-
-        // START Analyze argument
-        String organizedFileType = organizedFile.substring(organizedFile.lastIndexOf('.') + 1);
-        String logFileType = logFile.substring(logFile.lastIndexOf('.') + 1);
-        // END Analyze argument
-
-        // START Create a path
-        Path path = Paths.get(pathName);
-        Charset charset = StandardCharsets.UTF_8;
-        String fileString = new String(Files.readAllBytes(path), charset);
-        fileString = fileString.replaceAll("<br/>", "").replaceAll("&apos;", "'");
-        Files.write(path, fileString.getBytes(charset));
-        // END Create a path
-
-        // START Create the document
-        Document doc;
-        switch (fileFolderURL.toLowerCase()) {
-            case "file":
-                if (checkForBOM(new File(pathName)))
-                    doc = convertFileToDoc(circumvent(new File(pathName)));
-                else
-                    doc = convertFileToDoc(pathName);
-                break;
-            case "url":
-                doc = convertURLToDoc(getStringOfURL(pathName));
-                break;
-            default:
-                doc = null;
-                break;
-        }
-        // END Create the document
-
-        // START Create the file in the location specified
-        propArray = extract(doc);
-        createDoc(organizedFile, organizedFileType, propArray);
-        // END Create the file in the location specified
-
-        // START Doc parse end log
-        programLogs.finishedParsingDoc();
-        // END Doc parse end log
-
-        // START Speech Rate
-        SpeechRate SR = new SpeechRate(propArray, logFile);
-        // END Speech Rate
-
-        // START Analyzing Pronouns
-        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile);
-        AP.compAP();
-        // END Analyzing Pronouns
-
-        // START Program end
-        programLogs.endProgram();
-        // END Program end
-    }
-    */
-
+    /**
+     * Used when an folder is passed in as an argument
+     * @param pathName  File path of the XML file
+     * @param organizedFile  File path of organized text file
+     * @param logFile File path of log text file
+     * @param outputFile  File path of output text file
+     * @throws IOException                   IOException
+     * @throws ParseException                ParseException
+     * @throws SAXException                  SAXException
+     * @throws ParserConfigurationException  ParserConfigurationException
+     */
     private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile, String outputFile_list)
             throws IOException, ParseException, SAXException, ParserConfigurationException {
         // Scanner input = new Scanner(System.in);
@@ -251,6 +191,17 @@ public class Executor {
         // END Program end
     }
 
+    /**
+     * Used when an individual XML file is passed in as an argument
+     * @param pathName  File path of the XML file
+     * @param organizedFile  File path of organized text file
+     * @param logFile File path of log text file
+     * @param outputFile  File path of output text file
+     * @throws IOException                   IOException
+     * @throws ParseException                ParseException
+     * @throws SAXException                  SAXException
+     * @throws ParserConfigurationException  ParserConfigurationException
+     */
     private static void fileActionIndividual(String pathName, String organizedFile, String logFile, String outputFile)
             throws IOException, ParseException, SAXException, ParserConfigurationException {
 
@@ -528,7 +479,6 @@ public class Executor {
     }
 
     /**
-     *
      * @param arrayForFile  ArrayList of CaptionProp objects
      * @see  "https://stackoverflow.com/a/2885224/7211793"
      */
@@ -550,31 +500,128 @@ public class Executor {
         return file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     }
 
+    /**
+     * Used when creating directories for each XML file and its organized and output files.
+     * @param file  File path of XML file
+     * @param isIndividual  False if folder is passed in as argument
+     *                      True if individual XML file is passed in as argument
+     * @return  Name of new organized file
+     */
     private static String createOrganizedFilePath(String file, boolean isIndividual) {
         if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + _ORGANIZED + TXT;
         return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + _ORGANIZED + TXT;
     }
 
+    /**
+     * Used when creating directories for each XML file and its organized and output files.
+     * @param file  File path of XML file
+     * @param isIndividual  False if folder is passed in as argument
+     *                      True if individual XML file is passed in as argument
+     * @return  Name of new output file
+     */
     private static String createOutputFilePath(String file, boolean isIndividual) {
         if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + _OUTPUT + TXT;
         return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + _OUTPUT + TXT;
     }
 
+    /**
+     * Make a directory corresponding to each XML file name
+     * @param file  File path of an XML file
+     */
     private static void makeDirectoryAtParent(String file) {
         new File(file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/").mkdir();
     }
 
+    /**
+     * Used only when files are getting moved to other directories
+     * @param file  Current file path
+     * @return  String of new file path
+     */
     private static String getMovedFilePath(String file) {
         return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + file.substring(file.lastIndexOf('/') + 1);
     }
 
+    /**
+     * Makes output directory for secondary version of moving
+     * @param folder  Directory in which output directory is in currently
+     * @return  New directory file path
+     */
     private static String makeOutputDirectory(String folder) {
         String newFolder = folder.endsWith("/") ? folder + "Output/" : folder + "/Output/";
         File dir = new File(newFolder);
         boolean success = dir.mkdir();
         if (success) System.out.println("Successful");
-
         return newFolder;
     }
+
+    /*
+    private static void storeCodeForUse() {
+        // Scanner input = new Scanner(System.in);
+        // if (new File(logFile).exists()) {
+        //     System.out.println("File Exists. Delete this file? (Y or N)");
+        //     if (input.nextLine().equals("Y")) Files.delete(Paths.get(logFile));
+        // }
+
+        // START Delete file if exists
+        Files.delete(Paths.get(logFile));
+        // END Delete file if exists
+
+        Logging programLogs = new Logging(logFile);
+        programLogs.startProgram();
+
+        // START Analyze argument
+        String organizedFileType = organizedFile.substring(organizedFile.lastIndexOf('.') + 1);
+        String logFileType = logFile.substring(logFile.lastIndexOf('.') + 1);
+        // END Analyze argument
+
+        // START Create a path
+        Path path = Paths.get(pathName);
+        Charset charset = StandardCharsets.UTF_8;
+        String fileString = new String(Files.readAllBytes(path), charset);
+        fileString = fileString.replaceAll("<br/>", "").replaceAll("&apos;", "'");
+        Files.write(path, fileString.getBytes(charset));
+        // END Create a path
+
+        // START Create the document
+        Document doc;
+        switch (fileFolderURL.toLowerCase()) {
+            case "file":
+                if (checkForBOM(new File(pathName)))
+                    doc = convertFileToDoc(circumvent(new File(pathName)));
+                else
+                    doc = convertFileToDoc(pathName);
+                break;
+            case "url":
+                doc = convertURLToDoc(getStringOfURL(pathName));
+                break;
+            default:
+                doc = null;
+                break;
+        }
+        // END Create the document
+
+        // START Create the file in the location specified
+        propArray = extract(doc);
+        createDoc(organizedFile, organizedFileType, propArray);
+        // END Create the file in the location specified
+
+        // START Doc parse end log
+        programLogs.finishedParsingDoc();
+        // END Doc parse end log
+
+        // START Speech Rate
+        SpeechRate SR = new SpeechRate(propArray, logFile);
+        // END Speech Rate
+
+        // START Analyzing Pronouns
+        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile);
+        AP.compAP();
+        // END Analyzing Pronouns
+
+        // START Program end
+        programLogs.endProgram();
+        // END Program end
+    }
+    */
 
 }

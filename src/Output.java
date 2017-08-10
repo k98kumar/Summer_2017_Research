@@ -23,6 +23,19 @@ public class Output {
     }
 
     Output(int personalPronouns, ArrayList<PronounCount> personalArray,
+           int audiencePronouns, ArrayList<PronounCount> audienceArray,
+           int thirdPersonPronouns, ArrayList<PronounCount> thirdPersonArray,
+           String outputFile) {
+        this.personalPronouns = personalPronouns;
+        this.personalArray = personalArray;
+        this.audiencePronouns = audiencePronouns;
+        this.audienceArray = audienceArray;
+        this.thirdPersonPronouns = thirdPersonPronouns;
+        this.thirdPersonArray = thirdPersonArray;
+        this.outputFile = outputFile;
+    }
+
+    Output(int personalPronouns, ArrayList<PronounCount> personalArray,
                   int audiencePronouns, ArrayList<PronounCount> audienceArray,
                   int thirdPersonPronouns, ArrayList<PronounCount> thirdPersonArray,
                   String outputFile, String outputFile_list) {
@@ -36,19 +49,10 @@ public class Output {
         this.outputFile_list = outputFile_list;
     }
 
-    Output(int personalPronouns, ArrayList<PronounCount> personalArray,
-                  int audiencePronouns, ArrayList<PronounCount> audienceArray,
-                  int thirdPersonPronouns, ArrayList<PronounCount> thirdPersonArray,
-                  String outputFile) {
-        this.personalPronouns = personalPronouns;
-        this.personalArray = personalArray;
-        this.audiencePronouns = audiencePronouns;
-        this.audienceArray = audienceArray;
-        this.thirdPersonPronouns = thirdPersonPronouns;
-        this.thirdPersonArray = thirdPersonArray;
-        this.outputFile = outputFile;
-    }
-
+    /**
+     * Prints all Pronouns in the array and the number of occurrences.
+     * Prints in the form Pronoun:Count.
+     */
     void printEverything() {
         String everything = "Pronount:Count";
         everything += concatArrayList(personalArray) + concatArrayList(audienceArray) + concatArrayList(thirdPersonArray);
@@ -56,6 +60,11 @@ public class Output {
         if (outputFile_list != null) Logging.appendIntoFile(outputFile_list, everything);
     }
 
+    /**
+     * Creates String representation of PronounCount ArrayList
+     * @param arrList  PronounCount ArrayList of occurrences
+     * @return  String representation
+     */
     private String concatArrayList(ArrayList<PronounCount> arrList) {
         String concat = "";
         for (PronounCount pronounCount : arrList) {

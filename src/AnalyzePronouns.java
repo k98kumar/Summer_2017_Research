@@ -42,6 +42,12 @@ class AnalyzePronouns {
            |-> Look for " I ", " I.", and " I'"
      */
 
+    /**
+     * Assigns values to all variables in Logging and Output objects.
+     * Executes numberOfPersonalPronouns(), numberOfAudiencePronouns(),
+     * and numberOfThirdPersonPronouns() to show in Logging text files.
+     * Executes printEverything() command to show in Output text files.
+     */
     void compAP() {
         personalPronounArray.clear(); audiencePronounArray.clear(); thirdPersonPronounArray.clear();
         loggerPronouns.logFile = logFile;
@@ -64,9 +70,12 @@ class AnalyzePronouns {
     }
 
     /**
-     * Only thing in this class that uses the constructor
-     * @param input
-     * @return
+     * Counts number of occurrences of each pronoun surrounded by:
+     *     1) Space and Space
+     *     2) Space and Period
+     *     3) Space and Apostrophe
+     * @param input  Each pronoun String array
+     * @return  Number of occurrences
      */
     private ArrayList<PronounCount> countTraverse(String[] input) {
         ArrayList<PronounCount> arrCount = new ArrayList<>();
@@ -80,6 +89,11 @@ class AnalyzePronouns {
         return arrCount;
     }
 
+    /**
+     * Adds all pronouns of a type (First, Audience, Third)
+     * @param input  Each pronoun arrayList
+     * @return  Sum of number of pronouns
+     */
     private int totalCount(ArrayList<PronounCount> input) {
         int total = 0;
         for (PronounCount thing : input) {
@@ -94,7 +108,7 @@ class AnalyzePronouns {
      * @param sub  String that may be contained in larger string
      * @see  "https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/src-html/org/apache/commons/lang/StringUtils.html"
      *       Starts on Line 5318
-     * @return length of a String
+     * @return  Length of a String
      */
     private static int countMatches(String str, String sub) {
         if (isEmpty(str) || isEmpty(sub)) {
@@ -114,7 +128,7 @@ class AnalyzePronouns {
      * @param str  String being checked if empty
      * @see  "https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/src-html/org/apache/commons/lang/StringUtils.html#line.5318"
      *       Starts on Line 194
-     * @return boolean indicating if string is empty
+     * @return  Boolean indicating if string is empty
      */
     private static boolean isEmpty(String str) {
         return str == null || str.length() == 0;
