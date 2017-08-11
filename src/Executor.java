@@ -52,32 +52,28 @@ public class Executor {
         // START Arguments to variables
         String fileFolderURL = args[0];
         String path = args[1];
+        String listOrSort = args[2]; // Defaults to list because it's cleaner
         // END Arguments to variable
 
-        String organizedFile;
+        String sortOrganizedFile;
         String logFile;
-        String outputFile;
+        String sortOutputFile;
         String fileToString;
-
-        String cumulFolderOutput_list;
-        String outputFile_list;
 
         Path source;
         Path output;
 
+        if (!listOrSort.toLowerCase().equals("list") && !listOrSort.toLowerCase().equals("sort")) listOrSort = "list";
+
         switch (fileFolderURL.toLowerCase()) {
             case "file" :
                 logFile = path.substring(0, path.lastIndexOf('.')) + "_logger" + TXT;
-                organizedFile = createOrganizedFilePath(path, true);
-                outputFile = createOutputFilePath(path, true);
-                fileActionIndividual(path, organizedFile, logFile, outputFile);
+                sortOrganizedFile = createOrganizedFilePath(path, true);
+                sortOutputFile = createOutputFilePath(path, true);
+                fileActionIndividual(path, sortOrganizedFile, logFile, sortOutputFile);
                 break;
             case "folder" :
                 File folderPath = new File(path);
-                if (path.endsWith("/")) logFile = path + "logs" + TXT;
-                else logFile = path + "/logs" + TXT;
-                if (new File(logFile).exists())
-                    Files.delete(Paths.get(logFile));
                 for (File fileFolder : folderPath.listFiles()) {
                     try {
                         if (fileFolder.isDirectory()) Files.delete(Paths.get(fileFolder.getPath()));
@@ -92,27 +88,11 @@ public class Executor {
                         Files.delete(Paths.get(allOthers.getPath()));
                     }
                 }
-                cumulFolderOutput_list = makeOutputDirectory(path);
-                for (File fileEntry : folderPath.listFiles()) {
-                    if (fileEntry.getName().equals(".DS_Store")) {
-                        Files.delete(Paths.get(fileEntry.getPath()));
-                        continue;
-                    }
-                    if (fileEntry.isDirectory()) continue;
-                    fileToString = fileEntry.getPath();// + "/";
-                    makeDirectoryAtParent(fileToString); // Makes folder and has "/" at the end
-                    organizedFile = createOrganizedFilePath(fileToString, false); // Creates filepath in new folder
-                    outputFile = createOutputFilePath(fileToString, false);
-                    outputFile_list = cumulFolderOutput_list + getFileName(fileToString) + TXT;
 
-                    fileActionFolder(fileToString, organizedFile, logFile, outputFile, outputFile_list);
+                logFile = (path.endsWith("/")) ? path + "logs" + TXT : path + "/logs" + TXT;
+                if (new File(logFile).exists()) Files.delete(Paths.get(logFile));
 
-                    // + ---------------- Keep this commented ---------------- +
-                    // |           source = Paths.get(fileToString);           |
-                    // |  output = Paths.get(getMovedFilePath(fileToString));  |
-                    // |     Files.move(source, output, REPLACE_EXISTING);     |
-                    // + ---------------- Keep this commented ---------------- +
-                }
+                outputInListOrSort(path, folderPath, logFile, listOrSort);
                 break;
             case "url" :
                 fileActionURL();
@@ -121,6 +101,43 @@ public class Executor {
                 break;
         }
 
+    }
+
+    private static void outputInListOrSort(String path, File pathOfFolder, String logFile, String listOrSort)
+            throws SAXException, ParserConfigurationException, ParseException, IOException {
+        String fileToString, outputFile, organizedFile;
+
+        switch (listOrSort) {
+            case "list" :
+                String outputFolder = makeOutputDirectory(path);
+                String organizedFolder = makeOrganizedDirectory(path);
+                for (File fileEntry : pathOfFolder.listFiles()) {
+                    if (fileEntry.isDirectory()) continue;
+                    fileToString = fileEntry.getPath();
+                    outputFile = outputFolder + getFileName(fileToString) + TXT;
+                    organizedFile = organizedFolder + getFileName(fileToString) + TXT;
+                    fileActionFolder(fileToString, organizedFile, logFile, outputFile);
+                }
+                break;
+            case "sort" :
+                for (File fileEntry : pathOfFolder.listFiles()) {
+                    if (fileEntry.isDirectory()) continue;
+                    fileToString = fileEntry.getPath();
+                    makeDirectoryAtParent(fileToString);
+                    organizedFile = createOrganizedFilePath(fileToString, false); // Creates filepath in new folder
+                    outputFile = createOutputFilePath(fileToString, false);
+                    fileActionFolder(fileToString, organizedFile, logFile, outputFile);
+                }
+                break;
+            default:
+                break;
+        }
+
+        // + ---------------- Keep this commented ---------------- +
+        // |           source = Paths.get(fileToString);           |
+        // |  output = Paths.get(getMovedFilePath(fileToString));  |
+        // |     Files.move(source, output, REPLACE_EXISTING);     |
+        // + ---------------- Keep this commented ---------------- +
     }
 
     /**
@@ -134,7 +151,7 @@ public class Executor {
      * @throws SAXException                  SAXException
      * @throws ParserConfigurationException  ParserConfigurationException
      */
-    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile, String outputFile_list)
+    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile)
             throws IOException, ParseException, SAXException, ParserConfigurationException {
 
         Logging programLogs = new Logging(logFile);
@@ -173,7 +190,7 @@ public class Executor {
         // END Speech Rate
 
         // START Analyzing Pronouns
-        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile, outputFile_list);
+        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile);
         AP.compAP();
         // END Analyzing Pronouns
 
@@ -533,12 +550,25 @@ public class Executor {
     }
 
     /**
-     * Makes output directory for secondary version of moving
+     * Makes output directory for list viewing
      * @param folder  Directory in which output directory is in currently
      * @return  New directory file path
      */
     private static String makeOutputDirectory(String folder) {
         String newFolder = folder.endsWith("/") ? folder + "Output/" : folder + "/Output/";
+        File dir = new File(newFolder);
+        boolean success = dir.mkdir();
+        if (success) System.out.println("Successful");
+        return newFolder;
+    }
+
+    /**
+     * Makes organized directory for list viewing
+     * @param folder  Directory in which organized directory is in currently
+     * @return  New directory file path
+     */
+    private static String makeOrganizedDirectory(String folder) {
+        String newFolder = folder.endsWith("/") ? folder + "Organized/" : folder + "/Organized/";
         File dir = new File(newFolder);
         boolean success = dir.mkdir();
         if (success) System.out.println("Successful");
