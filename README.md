@@ -1,4 +1,4 @@
-# Summer_2017_Research
+# Summer 2017 Research
 Copyright 2017 Koushhik Kumar
 
 Licensed under the Apache License, Version 2.0 (the "License");
