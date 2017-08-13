@@ -35,6 +35,7 @@ public class Executor {
     private static String captions = "";
     private static ArrayList<CaptionProp> propArray = new ArrayList<>();
     private static final String TXT = ".txt";
+    private static final String TSV = ".tsv";
     private static final String _OUTPUT = "_output";
     private static final String _ORGANIZED = "_organized";
 
@@ -52,25 +53,26 @@ public class Executor {
         // START Arguments to variables
         String fileFolderURL = args[0];
         String path = args[1];
-        String listOrSort = args[2]; // Defaults to list because it's cleaner
+        String listOrSort;
+        try {
+            listOrSort = args[2];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            listOrSort = "list";
+        }
         // END Arguments to variable
 
-        String sortOrganizedFile;
-        String logFile;
-        String sortOutputFile;
-        String fileToString;
-
-        Path source;
-        Path output;
+        String organizedFile, outputFile, outputFileTSV, logFile;
+        Path source, output;
 
         if (!listOrSort.toLowerCase().equals("list") && !listOrSort.toLowerCase().equals("sort")) listOrSort = "list";
 
         switch (fileFolderURL.toLowerCase()) {
             case "file" :
                 logFile = path.substring(0, path.lastIndexOf('.')) + "_logger" + TXT;
-                sortOrganizedFile = createOrganizedFilePath(path, true);
-                sortOutputFile = createOutputFilePath(path, true);
-                fileActionIndividual(path, sortOrganizedFile, logFile, sortOutputFile);
+                organizedFile = createOrganizedFilePath(path, true);
+                outputFile = createOutputFilePath(path, true, TXT);
+                outputFileTSV = createOutputFilePath(path, true, TSV);
+                fileActionIndividual(path, organizedFile, logFile, outputFile, outputFileTSV);
                 break;
             case "folder" :
                 File folderPath = new File(path);
@@ -105,18 +107,20 @@ public class Executor {
 
     private static void outputInListOrSort(String path, File pathOfFolder, String logFile, String listOrSort)
             throws SAXException, ParserConfigurationException, ParseException, IOException {
-        String fileToString, outputFile, organizedFile;
-
+        String fileToString, outputFile, outputFileTSV, organizedFile;
+        String summaryTSV = (path.endsWith("/")) ? path + "Summary" + TSV : path + "/Summary" + TSV;
         switch (listOrSort) {
             case "list" :
-                String outputFolder = makeOutputDirectory(path);
+                String outputFolder = makeOutputDirectory(path, TXT);
+                String outputFolderTSV = makeOutputDirectory(path, TSV);
                 String organizedFolder = makeOrganizedDirectory(path);
                 for (File fileEntry : pathOfFolder.listFiles()) {
                     if (fileEntry.isDirectory()) continue;
                     fileToString = fileEntry.getPath();
                     outputFile = outputFolder + getFileName(fileToString) + TXT;
+                    outputFileTSV = outputFolderTSV + getFileName(fileToString) + TSV;
                     organizedFile = organizedFolder + getFileName(fileToString) + TXT;
-                    fileActionFolder(fileToString, organizedFile, logFile, outputFile);
+                    fileActionFolder(fileToString, organizedFile, logFile, outputFile, outputFileTSV, summaryTSV);
                 }
                 break;
             case "sort" :
@@ -125,19 +129,20 @@ public class Executor {
                     fileToString = fileEntry.getPath();
                     makeDirectoryAtParent(fileToString);
                     organizedFile = createOrganizedFilePath(fileToString, false); // Creates filepath in new folder
-                    outputFile = createOutputFilePath(fileToString, false);
-                    fileActionFolder(fileToString, organizedFile, logFile, outputFile);
+                    outputFile = createOutputFilePath(fileToString, false, TXT);
+                    outputFileTSV = createOutputFilePath(fileToString, false, TSV);
+                    fileActionFolder(fileToString, organizedFile, logFile, outputFile, outputFileTSV, summaryTSV);
+
+                    // + ---------------- Keep this commented ---------------- +
+                    // |           source = Paths.get(fileToString);           |
+                    // |  output = Paths.get(getMovedFilePath(fileToString));  |
+                    // |     Files.move(source, output, REPLACE_EXISTING);     |
+                    // + ---------------- Keep this commented ---------------- +
                 }
                 break;
             default:
                 break;
         }
-
-        // + ---------------- Keep this commented ---------------- +
-        // |           source = Paths.get(fileToString);           |
-        // |  output = Paths.get(getMovedFilePath(fileToString));  |
-        // |     Files.move(source, output, REPLACE_EXISTING);     |
-        // + ---------------- Keep this commented ---------------- +
     }
 
     /**
@@ -151,7 +156,7 @@ public class Executor {
      * @throws SAXException                  SAXException
      * @throws ParserConfigurationException  ParserConfigurationException
      */
-    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile)
+    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile, String outputFileTSV)
             throws IOException, ParseException, SAXException, ParserConfigurationException {
 
         Logging programLogs = new Logging(logFile);
@@ -190,7 +195,7 @@ public class Executor {
         // END Speech Rate
 
         // START Analyzing Pronouns
-        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile);
+        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile, outputFileTSV);
         AP.compAP();
         // END Analyzing Pronouns
 
@@ -212,7 +217,7 @@ public class Executor {
      * @throws SAXException                  SAXException
      * @throws ParserConfigurationException  ParserConfigurationException
      */
-    private static void fileActionIndividual(String pathName, String organizedFile, String logFile, String outputFile)
+    private static void fileActionIndividual(String pathName, String organizedFile, String logFile, String outputFile, String outputFileTSV)
             throws IOException, ParseException, SAXException, ParserConfigurationException {
 
         // START Delete file if exists
@@ -256,7 +261,7 @@ public class Executor {
         // END Speech Rate
 
         // START Analyzing Pronouns
-        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile);
+        AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile, outputFileTSV);
         AP.compAP();
         // END Analyzing Pronouns
 
@@ -527,9 +532,9 @@ public class Executor {
      *                      True if individual XML file is passed in as argument
      * @return  Name of new output file
      */
-    private static String createOutputFilePath(String file, boolean isIndividual) {
-        if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + _OUTPUT + TXT;
-        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + _OUTPUT + TXT;
+    private static String createOutputFilePath(String file, boolean isIndividual, String fileExtension) {
+        if (isIndividual) return file.substring(0, file.lastIndexOf('.')) + _OUTPUT + fileExtension;
+        return file.substring(0, file.lastIndexOf('/') + 1) + getFileName(file) + "/" + getFileName(file) + _OUTPUT + fileExtension;
     }
 
     /**
@@ -554,8 +559,19 @@ public class Executor {
      * @param folder  Directory in which output directory is in currently
      * @return  New directory file path
      */
-    private static String makeOutputDirectory(String folder) {
-        String newFolder = folder.endsWith("/") ? folder + "Output/" : folder + "/Output/";
+    private static String makeOutputDirectory(String folder, String fileExtension) {
+        String newFolder;
+        switch (fileExtension) {
+            case TXT :
+                newFolder = folder.endsWith("/") ? folder + "Output/" : folder + "/Output/";
+                break;
+            case TSV :
+                newFolder = folder.endsWith("/") ? folder + "OutputTSV/" : folder + "/OutputTSV/";
+                break;
+            default :
+                newFolder = folder.endsWith("/") ? folder + "OutputOther/" : folder + "/OutputOther/";
+                break;
+        }
         File dir = new File(newFolder);
         boolean success = dir.mkdir();
         if (success) System.out.println("Successful");

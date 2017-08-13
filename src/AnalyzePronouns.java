@@ -16,15 +16,17 @@ class AnalyzePronouns {
     private String captions;
     private String logFile;
     private String outputFile;
+    private String outputFileTSV;
 
-    AnalyzePronouns(String captions, String logFile, String outputFile) {
+    AnalyzePronouns(String captions, String logFile, String outputFile, String outputFileTSV) {
         this.captions = captions;
         this.logFile = logFile;
         this.outputFile = outputFile;
+        this.outputFileTSV = outputFileTSV;
     }
 
     private Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, null);
-    private Output output = new Output(0, null, 0, null, 0, null, null);
+    private Output output = new Output(0, null, 0, null, 0, null, null, null);
 
 
     /*
@@ -44,6 +46,7 @@ class AnalyzePronouns {
         personalPronounArray.clear(); audiencePronounArray.clear(); thirdPersonPronounArray.clear();
         loggerPronouns.logFile = logFile;
         output.outputFile = outputFile;
+        output.outputFileTSV = outputFileTSV;
         personalPronounArray = loggerPronouns.personalArray = output.personalArray = countTraverse(persArr);
         personalPronounCount = loggerPronouns.personalPronouns = output.personalPronouns = totalCount(loggerPronouns.personalArray);
         loggerPronouns.numberOfPersonalPronouns();
