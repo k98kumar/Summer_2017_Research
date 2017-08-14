@@ -1,13 +1,12 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by kash on 7/1/17.
  */
 class AnalyzePronouns {
 
-    public int personalPronounCount, audiencePronounCount, thirdPersonPronounCount;
-    public ArrayList<PronounCount> personalPronounArray = new ArrayList<>(), audiencePronounArray = new ArrayList<>(), thirdPersonPronounArray = new ArrayList<>();
+    private int personalPronounCount, audiencePronounCount, thirdPersonPronounCount;
+    private ArrayList<PronounCount> personalPronounArray = new ArrayList<>(), audiencePronounArray = new ArrayList<>(), thirdPersonPronounArray = new ArrayList<>();
 
     private String[] persArr = {"I", "me", "myself"};
     private String[] audArr = {"you", "yourself", "yourselves", "we"};
@@ -16,13 +15,11 @@ class AnalyzePronouns {
     private String captions;
     private String logFile;
     private String outputFile;
-    private String outputFileTSV;
 
-    AnalyzePronouns(String captions, String logFile, String outputFile, String outputFileTSV) {
+    AnalyzePronouns(String captions, String logFile, String outputFile) {
         this.captions = captions;
         this.logFile = logFile;
         this.outputFile = outputFile;
-        this.outputFileTSV = outputFileTSV;
     }
 
     private Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, null);
@@ -38,29 +35,24 @@ class AnalyzePronouns {
 
     /**
      * Assigns values to all variables in Logging and Output objects.
-     * Executes numberOfPersonalPronouns(), numberOfAudiencePronouns(),
-     * and numberOfThirdPersonPronouns() to show in Logging text files.
+     * Executes printPersonalPronouns(), printAudiencePronouns(),
+     * and printThirdPersonPronouns() to show in Logging text files.
      * Executes printEverything() command to show in Output text files.
      */
     void compAP() {
         personalPronounArray.clear(); audiencePronounArray.clear(); thirdPersonPronounArray.clear();
         loggerPronouns.logFile = logFile;
         output.outputFile = outputFile;
-        output.outputFileTSV = outputFileTSV;
         personalPronounArray = loggerPronouns.personalArray = output.personalArray = countTraverse(persArr);
         personalPronounCount = loggerPronouns.personalPronouns = output.personalPronouns = totalCount(loggerPronouns.personalArray);
-        loggerPronouns.numberOfPersonalPronouns();
+        loggerPronouns.printPersonalPronouns();
         audiencePronounArray = loggerPronouns.audienceArray = output.audienceArray = countTraverse(audArr);
         audiencePronounCount = loggerPronouns.audiencePronouns = output.audiencePronouns = totalCount(loggerPronouns.audienceArray);
-        loggerPronouns.numberOfAudiencePronouns();
+        loggerPronouns.printAudiencePronouns();
         thirdPersonPronounArray = loggerPronouns.thirdPersonArray = output.thirdPersonArray = countTraverse(thirdArr);
         thirdPersonPronounCount = loggerPronouns.thirdPersonPronouns = output.thirdPersonPronouns = totalCount(loggerPronouns.thirdPersonArray);
-        loggerPronouns.numberOfThirdPersonPronouns();
+        loggerPronouns.printThirdPersonPronouns();
         output.printEverything();
-    }
-
-    void compAPNoLog() {
-
     }
 
     /**

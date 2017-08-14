@@ -99,7 +99,7 @@ public class Logging {
     // END SpeechRate.java
 
     // START AnalyzePronouns.java
-    void numberOfPersonalPronouns() {
+    void printPersonalPronouns() {
         String label = "Number of Personal Pronouns: ";
         label += personalPronouns + "\n";
         for (PronounCount thing : personalArray) {
@@ -110,7 +110,7 @@ public class Logging {
         appendIntoFile(logFile, timeStamp + label);
     }
 
-    void numberOfAudiencePronouns() {
+    void printAudiencePronouns() {
         String label = "Number of Audience Pronouns: ";
         label += audiencePronouns + "\n";
         for (PronounCount thing : audienceArray) {
@@ -121,7 +121,7 @@ public class Logging {
         appendIntoFile(logFile, timeStamp + label);
     }
 
-    void numberOfThirdPersonPronouns() {
+    void printThirdPersonPronouns() {
         String label = "Number of Third Person Pronouns: ";
         label += thirdPersonPronouns + "\n";
         for (PronounCount thing : thirdPersonArray) {

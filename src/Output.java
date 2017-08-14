@@ -1,4 +1,3 @@
-import java.io.StringReader;
 import java.util.ArrayList;
 
 /**
@@ -15,7 +14,7 @@ public class Output {
     int thirdPersonPronouns;
     ArrayList<PronounCount> thirdPersonArray;
     String outputFile;
-    String outputFileTSV;
+    Summarizer summarizer;
 
     Output() {
     }
@@ -28,7 +27,7 @@ public class Output {
     Output(int personalPronouns, ArrayList<PronounCount> personalArray,
            int audiencePronouns, ArrayList<PronounCount> audienceArray,
            int thirdPersonPronouns, ArrayList<PronounCount> thirdPersonArray,
-           String outputFile, String outputFileTSV) {
+           String outputFile, Summarizer summarizer) {
         this.personalPronouns = personalPronouns;
         this.personalArray = personalArray;
         this.audiencePronouns = audiencePronouns;
@@ -36,19 +35,18 @@ public class Output {
         this.thirdPersonPronouns = thirdPersonPronouns;
         this.thirdPersonArray = thirdPersonArray;
         this.outputFile = outputFile;
-        this.outputFileTSV = outputFileTSV;
+        this.summarizer = summarizer;
     }
+
 
     /**
      * Prints all Pronouns in the array and the number of occurrences.
      * Prints in the form Pronoun:Count.
      */
     void printEverything() {
-        String showQuant = "Pronoun:Count", showQuantTSV = "Pronoun\tCount";
+        String showQuant = "Pronoun\tCount";
         showQuant += concatArrayList(personalArray) + concatArrayList(audienceArray) + concatArrayList(thirdPersonArray);
-        showQuantTSV += concatArrayListTSV(personalArray) + concatArrayListTSV(audienceArray) + concatArrayListTSV(thirdPersonArray);
         Logging.appendIntoFile(outputFile, showQuant);
-        Logging.appendIntoFile(outputFileTSV, showQuantTSV);
     }
 
     /**
@@ -57,14 +55,6 @@ public class Output {
      * @return  String representation
      */
     private String concatArrayList(ArrayList<PronounCount> arrList) {
-        String concat = "";
-        for (PronounCount pronounCount : arrList) {
-            concat += "\n" + pronounCount.getPronoun() + ":" + pronounCount.getCount();
-        }
-        return concat;
-    }
-
-    private String concatArrayListTSV(ArrayList<PronounCount> arrList) {
         String concat = "";
         for (PronounCount pronounCount : arrList) {
             concat += "\n" + pronounCount.getPronoun() + "\t" + pronounCount.getCount();

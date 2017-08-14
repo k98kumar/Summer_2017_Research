@@ -7,16 +7,18 @@
 public class Summarizer {
 
     String concatOutputDataTSV;
+    String summarizerFile;
 
     Summarizer() {
     }
 
-    Summarizer(String concatOutputDataTSV) {
+    Summarizer(String summarizerFile, String concatOutputDataTSV) {
+        this.summarizerFile = summarizerFile;
         this.concatOutputDataTSV = concatOutputDataTSV;
     }
 
     private void printConcatData() {
-        Logging.appendIntoFile(, concatOutputDataTSV);
+        Logging.appendIntoFile(summarizerFile, concatOutputDataTSV);
     }
 
 }
