@@ -61,7 +61,7 @@ public class Executor {
         }
         // END Arguments to variable
 
-        String organizedFile, outputFile, logFile;
+        String organizedFile, outputFile, logFile, summaryTSV;
         Path source, output;
         Summarizer summarizer = new Summarizer();
 
@@ -93,8 +93,9 @@ public class Executor {
 
                 logFile = (path.endsWith("/")) ? path + "logs" + TXT : path + "/logs" + TXT;
                 if (new File(logFile).exists()) Files.delete(Paths.get(logFile));
-
-                outputInListOrSort(path, folderPath, logFile, listOrSort);
+                summaryTSV = (path.endsWith("/")) ? path + "Summary" + TSV : path + "/Summary" + TSV;
+                summarizer.summarizerFile = summaryTSV;
+                outputInListOrSort(path, folderPath, logFile, listOrSort, summarizer);
                 break;
             case "url" :
                 fileActionURL();
@@ -105,10 +106,9 @@ public class Executor {
 
     }
 
-    private static void outputInListOrSort(String path, File pathOfFolder, String logFile, String listOrSort)
+    private static void outputInListOrSort(String path, File pathOfFolder, String logFile, String listOrSort, Summarizer summarizer)
             throws SAXException, ParserConfigurationException, ParseException, IOException {
         String fileToString, outputFile, organizedFile;
-        
         switch (listOrSort) {
             case "list" :
                 String outputFolder = makeOutputDirectory(path);
@@ -118,7 +118,7 @@ public class Executor {
                     fileToString = fileEntry.getPath();
                     outputFile = outputFolder + getFileName(fileToString) + TSV;
                     organizedFile = organizedFolder + getFileName(fileToString) + TXT;
-                    fileActionFolder(fileToString, organizedFile, logFile, outputFile);
+                    fileActionFolder(fileToString, organizedFile, logFile, outputFile, summarizer);
                 }
                 break;
             case "sort" :
@@ -128,7 +128,7 @@ public class Executor {
                     makeDirectoryAtParent(fileToString);
                     organizedFile = createOrganizedFilePath(fileToString, false); // Creates filepath in new folder
                     outputFile = createOutputFilePath(fileToString, false, TSV);
-                    fileActionFolder(fileToString, organizedFile, logFile, outputFile);
+                    fileActionFolder(fileToString, organizedFile, logFile, outputFile, summarizer);
 
                     // + ---------------- Keep this commented ---------------- +
                     // |           source = Paths.get(fileToString);           |
@@ -153,7 +153,7 @@ public class Executor {
      * @throws SAXException                  SAXException
      * @throws ParserConfigurationException  ParserConfigurationException
      */
-    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile)
+    private static void fileActionFolder(String pathName, String organizedFile, String logFile, String outputFile, Summarizer summarizer)
             throws IOException, ParseException, SAXException, ParserConfigurationException {
 
         Logging programLogs = new Logging(logFile);
