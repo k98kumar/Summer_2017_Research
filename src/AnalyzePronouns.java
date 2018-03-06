@@ -19,10 +19,6 @@ import java.util.ArrayList;
  */
 class AnalyzePronouns {
 
-    private int personalPronounCount, audiencePronounCount, thirdPersonPronounCount, generalPronounCount;
-    private ArrayList<PronounCount> personalPronounArray = new ArrayList<>(), audiencePronounArray = new ArrayList<>(),
-                                    thirdPersonPronounArray = new ArrayList<>(), generalPronounArray = new ArrayList<>();
-
     private String[] persArr = {"I", "me", "myself"};
     private String[] audArr = {"you", "yourself", "yourselves", "we"};
     private String[] thirdArr = {"he", "his", "her", "himself", "herself", "them", "themselves", "they"};
@@ -43,8 +39,8 @@ class AnalyzePronouns {
         this.summarizer = summarizer;
     }
 
-    private Logging loggerPronouns = new Logging(0, null, 0, null, 0, null, 0, null, null);
     private Output output = new Output(0, null, 0, null, 0, null, 0, null, null, null);
+    private Logging loggerPronouns = new Logging(output, null);
 
     public String[] getPersArr() {
         return persArr;
@@ -69,20 +65,23 @@ class AnalyzePronouns {
      * Executes printEverythingOutput() command to show in Output text files.
      */
     void comprehensiveAP() {
-        personalPronounArray.clear(); audiencePronounArray.clear(); thirdPersonPronounArray.clear(); generalPronounArray.clear();
         loggerPronouns.logFile = logFile;
         output.outputFile = outputFile;
-        personalPronounArray = loggerPronouns.personalArray = output.personalArray = countTraverse(persArr);
-        personalPronounCount = loggerPronouns.personalPronouns = output.personalPronouns = totalCount(loggerPronouns.personalArray);
+        output.personalArray = countTraverse(persArr);
+        output.personalPronouns = totalCount(output.personalArray);
+        loggerPronouns = new Logging(output, logFile);
         loggerPronouns.printPronounGroup("personal");
-        audiencePronounArray = loggerPronouns.audienceArray = output.audienceArray = countTraverse(audArr);
-        audiencePronounCount = loggerPronouns.audiencePronouns = output.audiencePronouns = totalCount(loggerPronouns.audienceArray);
+        output.audienceArray = countTraverse(audArr);
+        output.audiencePronouns = totalCount(output.audienceArray);
+        loggerPronouns = new Logging(output, logFile);
         loggerPronouns.printPronounGroup("audience");
-        thirdPersonPronounArray = loggerPronouns.thirdPersonArray = output.thirdPersonArray = countTraverse(thirdArr);
-        thirdPersonPronounCount = loggerPronouns.thirdPersonPronouns = output.thirdPersonPronouns = totalCount(loggerPronouns.thirdPersonArray);
+        output.thirdPersonArray = countTraverse(thirdArr);
+        output.thirdPersonPronouns = totalCount(output.thirdPersonArray);
+        loggerPronouns = new Logging(output, logFile);
         loggerPronouns.printPronounGroup("third");
-        generalPronounArray = loggerPronouns.generalArray = output.generalArray = countTraverse(generalArr);
-        generalPronounCount = loggerPronouns.generalPronouns = output.generalPronouns = totalCount(loggerPronouns.thirdPersonArray);
+        output.generalArray = countTraverse(generalArr);
+        output.generalPronouns = totalCount(output.thirdPersonArray);
+        loggerPronouns = new Logging(output, logFile);
         loggerPronouns.printPronounGroup("general");
         output.printEverythingOutput();
         if (summarizer != null) {

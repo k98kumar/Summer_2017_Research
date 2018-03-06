@@ -258,7 +258,6 @@ public class Executor {
 
         // START Analyzing Pronouns
         AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile, summarizer);
-        // AP.comprehensiveAP();
         AP.comprehensiveAP();
         // END Analyzing Pronouns
 
@@ -325,7 +324,6 @@ public class Executor {
 
         // START Analyzing Pronouns
         AnalyzePronouns AP = new AnalyzePronouns(captions, logFile, outputFile, null);
-        // AP.comprehensiveAP();
         AP.comprehensiveAP();
         // END Analyzing Pronouns
 

@@ -61,6 +61,14 @@ public class Logging {
         this.secondsSpoken = secondsSpoken;
     }
 
+    Logging(Output output, String logFile) {
+        this.personalPronouns = output.personalPronouns;        this.personalArray = output.personalArray;
+        this.audiencePronouns = output.audiencePronouns;        this.audienceArray = output.audienceArray;
+        this.thirdPersonPronouns = output.thirdPersonPronouns;  this.thirdPersonArray = output.thirdPersonArray;
+        this.generalPronouns = output.generalPronouns;          this.generalArray = output.generalArray;
+        this.logFile = logFile;
+    }
+
     Logging(int personalPronouns, ArrayList<PronounCount> personalArray,
             int audiencePronouns, ArrayList<PronounCount> audienceArray,
             int thirdPersonPronouns, ArrayList<PronounCount> thirdPersonArray,
