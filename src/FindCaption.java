@@ -23,10 +23,10 @@ import java.util.TimeZone;
  */
 public class FindCaption {
 
-    ArrayList<CaptionProp> captions;
-    String time;
-    String logFile;
-    Date date;
+    private ArrayList<CaptionProp> captions;
+    private String time;
+    private String logFile;
+    private Date date;
 
     public FindCaption(ArrayList<CaptionProp> captions, String time, String logFile, Date date) {
         this.captions = captions;
@@ -44,9 +44,9 @@ public class FindCaption {
 
     public String findCaptionTextFromTime() throws ParseException, NullPointerException {
         CaptionProp toReturn = null;
-        for (CaptionProp c : captions) {
-            if (checkDatePrecedesOrEqualsCaptionDate(convertToDateTimeInsideClass(time), convertToDateTimeInsideClass(c.getEnd()))) {
-                toReturn = c;
+        for (CaptionProp captionProp : captions) {
+            if (checkDatePrecedesOrEqualsCaptionDate(convertToDateTime(time), convertToDateTime(captionProp.getEnd()))) {
+                toReturn = captionProp;
                 break;
             }
         }
@@ -54,13 +54,15 @@ public class FindCaption {
         return toReturn.getText();
     }
 
+    /*
     public void convertToDateTimeOutsideClass() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss:SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("CST"));
         date = sdf.parse(time);
     }
+    */
 
-    private Date convertToDateTimeInsideClass(String capTime) throws ParseException {
+    private Date convertToDateTime(String capTime) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("CST"));
         return sdf.parse(capTime);

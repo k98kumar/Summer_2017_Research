@@ -34,13 +34,12 @@ class SpeechRate {
     private Logging loggerSpeech = new Logging(-1, -1);
 
     /**
-     * Uses an arrayList as a parameter, in constructor.
+     * Uses an ArrayList of CaptionProp objects from constructor.
      * Use Integer.parseInt() to convert to an int.
      * Not completed yet.
      * @return  ArrayList of Doubles indicating the number
      *          of words speaker speaks per second in each
      *          individual caption
-     *
      */
     public ArrayList<Double> sepCapWPSec() throws Exception {
         ArrayList<Double> countArray = new ArrayList<>();
@@ -53,7 +52,6 @@ class SpeechRate {
     /**
      * Uses ArrayList of CaptionProp objects, taken from
      * the constructor.
-     *
      * @return  Total number of words divided by the
      *          total time of the lecture
      */
@@ -71,13 +69,8 @@ class SpeechRate {
      * @return  Number of words
      */
     public int wordsInString(String str) {
-        int count = 0;
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == ' ') {
-                count++;
-            }
-        }
-        return count + 1;
+        String strTrim = str.trim();
+        return strTrim.isEmpty() ? 0 : strTrim.split("\\s+").length;
     }
 
     /**
@@ -89,14 +82,12 @@ class SpeechRate {
      * @return  Lecture length in seconds
      */
     public double secondsElapsed(String time1, String time2) throws Exception {
-
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("CST")); // Offset of 64800000 msec
         Date dateBegin = sdf.parse(time1);
         Date dateEnd = sdf.parse(time2);
         double difference = dateEnd.getTime() - dateBegin.getTime();
         return (difference - 64800000) / 1000;
-
     }
 
 }

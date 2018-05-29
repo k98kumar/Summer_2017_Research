@@ -21,12 +21,12 @@ public class CaptionProp {
     //     Time format is in HH:mm:ss.SSS     //
     // -------------------------------------- //
 
-    String begin;
-    String end;
-    String timeDiff;
-    String region;
-    String text;
-    static final String DELIMITOR = ",";
+    private String begin;
+    private String end;
+    private String timeDiff;
+    private String region;
+    private String text;
+    private static final String DELIMITOR = ",";
 
     public CaptionProp(String begin, String end, String timeDiff, String region, String text) {
         this.begin = begin;
