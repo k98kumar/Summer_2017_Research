@@ -117,7 +117,7 @@ public class Executor {
      * Starts at the parent folder and deletes all folders and XML files recursively
      * @param path  The parent folder under which all files that match the below
      *              specification(s) are deleted
-     * @throws IOException
+     * @throws IOException  IOException
      */
     private static void recursiveDeletion(String path) throws IOException {
         File initialFolderPath = new File(path);
@@ -133,7 +133,7 @@ public class Executor {
     /**
      * Helper method for recursiveDeletion() and recursively deletes folders
      * @param path  Parent folder at which to start the inner recursive deletion
-     * @throws IOException
+     * @throws IOException  IOException
      */
     private static void innerDirRecDel(String path) throws IOException {
         for (File eachFile : new File(path).listFiles()) {
@@ -162,10 +162,10 @@ public class Executor {
      *                    the format of list or sort
      * @param summarizer  The Summarizer object which will contain the data
      *                    of all the XML caption files in the folder.
-     * @throws SAXException
-     * @throws ParserConfigurationException
-     * @throws ParseException
-     * @throws IOException
+     * @throws SAXException                     SAXException
+     * @throws ParserConfigurationException     ParserConfigurationException
+     * @throws ParseException                   ParseException
+     * @throws IOException                      IOException
      */
     private static void outputInListOrSort(String folderPath, File fileFolderPath, String logFile, String listOrSort, Summarizer summarizer)
             throws SAXException, ParserConfigurationException, ParseException, IOException {
@@ -337,9 +337,9 @@ public class Executor {
 
     /**
      * Returns a String representation of the XML code from local copy
-     * @param pathToFile
-     * @return
-     * @throws IOException
+     * @param pathToFile  Path to file that is being read
+     * @return  String representation of file contents
+     * @throws IOException  IOException
      */
     private static String getStringOfFile(String pathToFile) throws IOException {
 
@@ -360,9 +360,9 @@ public class Executor {
 
     /**
      * Returns a String representation of the XML code from URL
-     * @param urlToCode
-     * @return
-     * @throws IOException
+     * @param urlToCode  URL of file that is being read
+     * @return  String representation of file contents
+     * @throws IOException  IOException
      */
     private static String getStringOfURL(String urlToCode) throws IOException {
 
@@ -384,8 +384,8 @@ public class Executor {
      * BOM contains "EF BB BF"
      * Checks if bytes of file start with BOM
      * @param fileToCheck  Input file that may contain BOM
-     * @return
-     * @throws FileNotFoundException
+     * @return  Whether the file begins with a BOM
+     * @throws FileNotFoundException    FileNotFoundException
      */
     private static boolean checkForBOM(File fileToCheck) throws FileNotFoundException {
 
@@ -433,9 +433,9 @@ public class Executor {
      * Converts the contents of the file to a Document
      * @param pathToFile  File path name as a String
      * @return  Document that contains lines of file
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
+     * @throws IOException                      IOException
+     * @throws ParserConfigurationException     ParserConfigurationException
+     * @throws SAXException                     SAXException
      * @see  "https://www.mkyong.com/java/how-to-read-xml-file-in-java-dom-parser/"
      */
     private static Document convertFileToDoc(String pathToFile) throws IOException, ParserConfigurationException, SAXException {
@@ -451,8 +451,8 @@ public class Executor {
      * Converts the contents of the file to a Document
      * @param urlToCode  URL path name as a String
      * @return  Document that contains lines of file
-     * @throws IOException
-     * @throws SAXException
+     * @throws IOException      IOException
+     * @throws SAXException     SAXException
      * @see  "https://stackoverflow.com/a/7902162/7211793"
      */
     private static Document convertURLToDoc(String urlToCode) throws IOException, SAXException {
@@ -554,6 +554,8 @@ public class Executor {
     }
 
     /**
+     * @param outputPath  Path of the output file
+     * @param fileType  File Extension
      * @param arrayForFile  ArrayList of CaptionProp objects
      * @see  "https://stackoverflow.com/a/2885224/7211793"
      */
@@ -570,6 +572,10 @@ public class Executor {
         }
     }
 
+    /**
+     * @param file  File name including its extension
+     * @return  Extension of file
+     */
     private static String getFileName(String file) {
         return file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     }

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Research_Parse_XML.iml" filepath="$PROJECT_DIR$/Research_Parse_XML.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BaseAnalysis.iml" filepath="$PROJECT_DIR$/BaseAnalysis.iml" />
     </modules>
   </component>
 </project>
